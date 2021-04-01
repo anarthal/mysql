@@ -37,8 +37,10 @@ std::vector<network_functions<Stream>*> make_all_network_functions()
         network_functions_singleton<async_callback_noerrinfo<Stream>>(),
         network_functions_singleton<async_coroutine_errinfo<Stream>>(),
         network_functions_singleton<async_coroutine_noerrinfo<Stream>>(),
+#ifdef BOOST_ASIO_HAS_CO_AWAIT
         network_functions_singleton<async_coroutinecpp20_errinfo<Stream>>(),
         network_functions_singleton<async_coroutinecpp20_noerrinfo<Stream>>(),
+#endif
         network_functions_singleton<async_future_errinfo<Stream>>(),
         network_functions_singleton<async_future_noerrinfo<Stream>>(),
     };
@@ -65,6 +67,14 @@ const std::vector<network_functions<Stream>*>& all_network_functions()
 } // mysql
 } // boost
 
+#ifdef BOOST_ASIO_HAS_CO_AWAIT
+#define BOOST_MYSQL_NETFNS_INSTANTIATE_CPP20CORO(Stream) \
+    template class boost::mysql::test::async_coroutinecpp20_errinfo<Stream>; \
+    template class boost::mysql::test::async_coroutinecpp20_noerrinfo<Stream>;
+#else
+#define BOOST_MYSQL_NETFNS_INSTANTIATE_CPP20CORO(Stream)
+#endif
+
 #define BOOST_MYSQL_NETFNS_INSTANTIATE(Stream) \
     template class boost::mysql::test::sync_errc<Stream>; \
     template class boost::mysql::test::sync_exc<Stream>; \
@@ -72,10 +82,9 @@ const std::vector<network_functions<Stream>*>& all_network_functions()
     template class boost::mysql::test::async_callback_noerrinfo<Stream>;  \
     template class boost::mysql::test::async_coroutine_errinfo<Stream>; \
     template class boost::mysql::test::async_coroutine_noerrinfo<Stream>; \
-    template class boost::mysql::test::async_coroutinecpp20_errinfo<Stream>; \
-    template class boost::mysql::test::async_coroutinecpp20_noerrinfo<Stream>; \
     template class boost::mysql::test::async_future_errinfo<Stream>; \
-    template class boost::mysql::test::async_future_noerrinfo<Stream>; 
+    template class boost::mysql::test::async_future_noerrinfo<Stream>; \
+    BOOST_MYSQL_NETFNS_INSTANTIATE_CPP20CORO(Stream)
 
 
 
