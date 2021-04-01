@@ -47,4 +47,4 @@ environment:
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
       CMAKE_BUILD_TYPE: Release
       PLATFORM: x86
-    
+
