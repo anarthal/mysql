@@ -5,14 +5,14 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
+#ifndef BOOST_MYSQL_TEST_INTEGRATION_STREAM_LIST_HPP
+#define BOOST_MYSQL_TEST_INTEGRATION_STREAM_LIST_HPP
+
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/asio/local/stream_protocol.hpp>
 #include <boost/asio/ssl/stream.hpp>
 #include <boost/mp11/list.hpp>
 #include "tcp_future_socket.hpp"
-
-#ifndef BOOST_MYSQL_TEST_INTEGRATION_STREAM_LIST_HPP
-#define BOOST_MYSQL_TEST_INTEGRATION_STREAM_LIST_HPP
 
 
 namespace boost {
