@@ -121,7 +121,7 @@ endif()
 # under valgrind. Coroutine tests don't work well under Valgrind, and
 # SSL tests are too slow. We do some other exclusions to reduce runtime
 if (BOOST_MYSQL_VALGRIND_TESTS)
-    set(TEST_FILTER "!@sha256:!@sslrequire:!@async_coroutine_errinfo:!@async_coroutine_noerrinfo:!@unix:!@tcp_default_token:!@unix")
+    set(TEST_FILTER "!@sha256:!@ssl:!@async_coroutine_errinfo:!@async_coroutine_noerrinfo:!@unix:!@unix")
     add_memcheck_test(
         NAME boost_mysql_integrationtests_memcheck
         COMMAND ${CMAKE_CURRENT_BINARY_DIR}/boost_mysql_integrationtests "-t" ${TEST_FILTER}
