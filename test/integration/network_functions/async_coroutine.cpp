@@ -59,7 +59,7 @@ public:
     }
     network_result<no_result> connect(
         connection_type& conn,
-        const typename Stream::endpoint_type& ep,
+        const typename Stream::lowest_layer_type::endpoint_type& ep,
         const connection_params& params
     ) override
     {
@@ -204,7 +204,7 @@ public:
     }
     network_result<no_result> connect(
         connection_type& conn,
-        const typename Stream::endpoint_type& ep,
+        const typename Stream::lowest_layer_type::endpoint_type& ep,
         const connection_params& params
     ) override
     {

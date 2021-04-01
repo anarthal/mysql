@@ -11,6 +11,7 @@
 #include <boost/mysql/detail/network_algorithms/read_row.hpp>
 #include <boost/asio/coroutine.hpp>
 #include <boost/asio/bind_executor.hpp>
+#include <boost/asio/post.hpp>
 #include <cassert>
 #include <limits>
 #include <memory>

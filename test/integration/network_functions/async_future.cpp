@@ -111,7 +111,7 @@ public:
     const char* name() const override { return "async_future_errinfo"; }
     network_result<no_result> connect(
         connection_type& conn,
-        const typename Stream::endpoint_type& ep,
+        const typename Stream::lowest_layer_type::endpoint_type& ep,
         const connection_params& params
     ) override
     {
@@ -227,7 +227,7 @@ public:
     const char* name() const override { return "async_future_noerrinfo"; }
     network_result<no_result> connect(
         connection_type& conn,
-        const typename Stream::endpoint_type& ep,
+        const typename Stream::lowest_layer_type::endpoint_type& ep,
         const connection_params& params
     ) override
     {
@@ -344,7 +344,7 @@ public:
     const char* name() const override { return "async_future_errinfo"; }
     network_result<no_result> connect(
         connection_type& conn,
-        const typename tcp_future_socket::endpoint_type& ep,
+        const typename tcp_future_socket::lowest_layer_type::endpoint_type& ep,
         const connection_params& params
     ) override
     {
@@ -460,7 +460,7 @@ public:
     const char* name() const override { return "async_future_noerrinfo"; }
     network_result<no_result> connect(
         connection_type& conn,
-        const typename tcp_future_socket::endpoint_type& ep,
+        const typename tcp_future_socket::lowest_layer_type::endpoint_type& ep,
         const connection_params& params
     ) override
     {
@@ -590,4 +590,10 @@ boost::mysql::test::async_future_errinfo_functions<tcp_future_socket>();
 
 template network_functions<tcp_future_socket>*
 boost::mysql::test::async_future_noerrinfo_functions<tcp_future_socket>();
+
+template network_functions<tcp_ssl_future_socket>*
+boost::mysql::test::async_future_errinfo_functions<tcp_ssl_future_socket>();
+
+template network_functions<tcp_ssl_future_socket>*
+boost::mysql::test::async_future_noerrinfo_functions<tcp_ssl_future_socket>();
 

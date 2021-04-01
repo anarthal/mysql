@@ -115,7 +115,7 @@ struct caching_sha2_fixture : handshake_fixture<Stream>
 {
     void load_sha256_cache(boost::string_view user, boost::string_view password)
     {
-        tcp_ssl_connection conn (this->ctx);
+        tcp_ssl_connection conn (this->ctx, this->ssl_ctx);
         conn.connect(
             get_endpoint<boost::asio::ip::tcp::socket>(endpoint_kind::localhost),
             connection_params(user, password)
@@ -125,7 +125,7 @@ struct caching_sha2_fixture : handshake_fixture<Stream>
 
     void clear_sha256_cache()
     {
-        tcp_ssl_connection conn (this->ctx);
+        tcp_ssl_connection conn (this->ctx, this->ssl_ctx);
         conn.connect(
             get_endpoint<boost::asio::ip::tcp::socket>(endpoint_kind::localhost),
             connection_params("root", "")

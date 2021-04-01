@@ -9,7 +9,7 @@
 #define BOOST_MYSQL_TEST_INTEGRATION_NETWORK_FUNCTIONS_HPP
 
 #include <boost/mysql/socket_connection.hpp>
-#include "tcp_future_socket.hpp"
+#include "stream_list.hpp"
 #include <forward_list>
 #include <boost/optional/optional.hpp>
 
@@ -89,7 +89,7 @@ public:
 
     virtual ~network_functions() = default;
     virtual const char* name() const = 0;
-    virtual network_result<no_result> connect(connection_type&, const typename Stream::endpoint_type&,
+    virtual network_result<no_result> connect(connection_type&, const typename Stream::lowest_layer_type::endpoint_type&,
             const connection_params&) = 0;
     virtual network_result<no_result> handshake(connection_type&, const connection_params&) = 0;
     virtual network_result<resultset_type> query(connection_type&, boost::string_view query) = 0;
@@ -109,10 +109,6 @@ public:
 
 template <class Stream>
 const std::vector<network_functions<Stream>*>& all_network_functions();
-
-template <>
-const std::vector<network_functions<tcp_future_socket>*>&
-all_network_functions<tcp_future_socket>();
 
 } // test
 } // mysql

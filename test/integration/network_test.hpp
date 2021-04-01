@@ -83,7 +83,7 @@ struct network_test_registrar_op
     {
         for (const auto& sample: DataGenerator:: template generate<Stream>())
         {
-            self.template create_test<Stream>(sample, tc_file, tc_line, suite);
+            self.template create_test<Stream>(sample, tc_file, tc_line, *suite);
         }
     }
 };
@@ -112,7 +112,7 @@ struct network_test_registrar
         collector.reset();
 
         // Create a test for each sample and each stream type
-        network_test_registrar_op<network_test_registrar<Testcase, TypeList>, TypeList> op {
+        network_test_registrar_op<network_test_registrar<Testcase, TypeList>, DataGenerator> op {
             *this, tc_name, tc_file, tc_line, suite
         };
         boost::mp11::mp_for_each<boost::mp11::mp_transform<boost::mp11::mp_identity, TypeList>>(op);
@@ -169,7 +169,7 @@ struct network_test_registrar
     )
 
 #define BOOST_MYSQL_NETWORK_TEST(name, fixture, data_gen) \
-    BOOST_MYSQL_NETWORK_TEST_EX(name, fixture, data_gen, all_streams)
+    BOOST_MYSQL_NETWORK_TEST_EX(name, fixture, data_gen, ::boost::mysql::test::all_streams)
 
 
 #endif

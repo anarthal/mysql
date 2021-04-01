@@ -99,14 +99,14 @@ struct network_fixture
 
     void physical_connect()
     {
-        conn.next_layer().connect(get_endpoint<Stream>(endpoint_kind::localhost));
+        conn.next_layer().lowest_layer().connect(get_endpoint<Stream>(endpoint_kind::localhost));
     }
 
     void handshake(ssl_mode m = ssl_mode::require)
     {
         params.set_ssl(m);
         conn.handshake(params);
-        validate_ssl(conn, m);
+        validate_ssl(conn);
     }
 
     void connect(ssl_mode m = ssl_mode::require)
@@ -177,13 +177,20 @@ std::ostream& operator<<(std::ostream& os, const network_sample<Stream>& value)
 struct network_gen
 {
     template <class Stream>
-    static const std::vector<network_sample<Stream>>& generate()
+    static std::vector<network_sample<Stream>> make_all()
     {
         std::vector<network_sample<Stream>> res;
         for (auto* net: all_network_functions<Stream>())
         {
             res.emplace_back(net);
         }
+        return res;
+    }
+
+    template <class Stream>
+    static const std::vector<network_sample<Stream>>& generate()
+    {
+        static std::vector<network_sample<Stream>> res = make_all<Stream>();
         return res;
     }
 };

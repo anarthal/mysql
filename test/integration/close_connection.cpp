@@ -26,7 +26,7 @@ BOOST_MYSQL_NETWORK_TEST(active_connection, network_fixture, network_gen)
     query_result.validate_any_error();
 
     // The stream is closed
-    BOOST_TEST(!this->conn.next_layer().is_open());
+    BOOST_TEST(!this->conn.next_layer().lowest_layer().is_open());
 }
 
 BOOST_MYSQL_NETWORK_TEST(double_close, network_fixture, network_gen)
@@ -39,14 +39,14 @@ BOOST_MYSQL_NETWORK_TEST(double_close, network_fixture, network_gen)
     result.validate_no_error();
 
     // The stream (socket) is closed
-    BOOST_TEST(!this->conn.next_layer().is_open());
+    BOOST_TEST(!this->conn.next_layer().lowest_layer().is_open());
 
     // Closing again returns OK (and does nothing)
     result = sample.net->close(this->conn);
     result.validate_no_error();
 
     // Stream (socket) still closed
-    BOOST_TEST(!this->conn.next_layer().is_open());
+    BOOST_TEST(!this->conn.next_layer().lowest_layer().is_open());
 }
 
 BOOST_MYSQL_NETWORK_TEST(not_open_connection, network_fixture, network_gen)

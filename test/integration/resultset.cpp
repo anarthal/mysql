@@ -116,15 +116,13 @@ struct resultset_sample
 template <class Stream>
 std::ostream& operator<<(std::ostream& os, const resultset_sample<Stream>& input)
 {
-    return os << input.net->name() << '_'
-              << to_string(input.ssl)
-              << '_' << input.gen->name();
+    return os << input.net->name() << '_' << input.gen->name();
 }
 
 struct sample_gen
 {
     template <class Stream>
-    static const std::vector<resultset_sample<Stream>>& generate()
+    static std::vector<resultset_sample<Stream>> make_all()
     {
         static text_resultset_generator<Stream> text_obj;
         static binary_resultset_generator<Stream> binary_obj;
@@ -142,6 +140,13 @@ struct sample_gen
                 res.emplace_back(net, gen);
             }
         }
+        return res;
+    }
+
+    template <class Stream>
+    static const std::vector<resultset_sample<Stream>>& generate()
+    {
+        static const std::vector<resultset_sample<Stream>> res = make_all<Stream>();
         return res;
     }
 };

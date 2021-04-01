@@ -92,10 +92,27 @@ boost::mysql::test::all_network_functions<tcp_future_socket>()
     return res;
 }
 
-template const std::vector<network_functions<boost::asio::ip::tcp::socket>*>&
+template <>
+const std::vector<network_functions<tcp_ssl_future_socket>*>&
+boost::mysql::test::all_network_functions<tcp_ssl_future_socket>()
+{
+    static std::vector<network_functions<tcp_ssl_future_socket>*> res {
+        async_future_errinfo_functions<tcp_ssl_future_socket>(),
+        async_future_noerrinfo_functions<tcp_ssl_future_socket>(),
+    };
+    return res;
+}
+
+template const std::vector<network_functions<tcp_socket>*>&
+boost::mysql::test::all_network_functions();
+
+template const std::vector<network_functions<tcp_ssl_socket>*>&
 boost::mysql::test::all_network_functions();
 
 #ifdef BOOST_ASIO_HAS_LOCAL_SOCKETS
-template const std::vector<network_functions<boost::asio::local::stream_protocol::socket>*>&
+template const std::vector<network_functions<unix_socket>*>&
+boost::mysql::test::all_network_functions();
+
+template const std::vector<network_functions<unix_ssl_socket>*>&
 boost::mysql::test::all_network_functions();
 #endif

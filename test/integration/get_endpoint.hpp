@@ -69,7 +69,7 @@ struct endpoint_getter<boost::asio::local::stream_protocol>
 #endif
 
 template <class Stream>
-typename Stream::endpoint_type get_endpoint(
+typename Stream::lowest_layer_type::endpoint_type get_endpoint(
     endpoint_kind kind
 )
 {
