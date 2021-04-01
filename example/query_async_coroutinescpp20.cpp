@@ -139,7 +139,7 @@ void main_impl(int argc, char** argv)
         argv[2],               // password
         "boost_mysql_examples" // database to use; leave empty or omit the parameter for no database
     );
-    boost::asio::ssl::context ssl_ctx (boost::asio::ssl::content::tls_client);
+    boost::asio::ssl::context ssl_ctx (boost::asio::ssl::context::tls_client);
 
     /**
      * The entry point. We spawn a thread of execution to run our
