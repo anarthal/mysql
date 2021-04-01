@@ -6,6 +6,10 @@
 //
 
 //[example_default_completion_tokens]
+#include "boost/mysql/socket_connection.hpp"
+#include <boost/asio/basic_stream_socket.hpp>
+#include <boost/asio/ip/tcp.hpp>
+#include <boost/asio/ssl/context.hpp>
 #include <boost/mysql.hpp>
 #include <boost/asio/io_context.hpp>
 #include <boost/system/system_error.hpp>
@@ -83,7 +87,11 @@ public:
 using base_executor_type = boost::asio::io_context::executor_type;
 using coro_executor_type = boost::asio::use_awaitable_t<
     base_executor_type>::executor_with_default<base_executor_type>;
-using connection_type = boost::mysql::tcp_ssl_connection::rebind_executor<coro_executor_type>::other;
+using connection_type = boost::mysql::socket_connection<
+    boost::asio::ssl::stream<
+        boost::asio::basic_stream_socket<boost::asio::ip::tcp, coro_executor_type>
+    >
+>;
 
 // Our coroutine
 boost::asio::awaitable<void, base_executor_type> start_query(
@@ -148,7 +156,7 @@ void main_impl(int argc, char** argv)
         argv[2],               // password
         "boost_mysql_examples" // database to use; leave empty or omit the parameter for no database
     );
-    boost::asio::ssl::context ssl_ctx;
+    boost::asio::ssl::context ssl_ctx (boost::asio::ssl::context::tls_client);
 
     /**
      * The entry point. We spawn a thread of execution to run our

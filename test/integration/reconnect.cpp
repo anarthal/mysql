@@ -29,7 +29,7 @@ struct reconnect_fixture : network_fixture<Stream>
     {
         auto result = net->connect(this->conn, get_endpoint<Stream>(endpoint_kind::localhost), this->params);
         result.validate_no_error();
-        validate_ssl(this->conn);
+        validate_ssl(this->conn, this->params.ssl());
     }
 
     void do_query_ok(network_functions<Stream>* net)
@@ -42,7 +42,7 @@ struct reconnect_fixture : network_fixture<Stream>
     }
 };
 
-BOOST_MYSQL_NETWORK_TEST(reconnect_after_close, reconnect_fixture, network_gen)
+BOOST_MYSQL_NETWORK_TEST_EX(reconnect_after_close, reconnect_fixture, network_gen, all_non_ssl_streams)
 {
     // Connect and use the connection
     this->do_connect_ok(sample.net);
@@ -57,7 +57,7 @@ BOOST_MYSQL_NETWORK_TEST(reconnect_after_close, reconnect_fixture, network_gen)
     this->do_query_ok(sample.net);
 }
 
-BOOST_MYSQL_NETWORK_TEST(reconnect_after_handshake_error, reconnect_fixture, network_gen)
+BOOST_MYSQL_NETWORK_TEST_EX(reconnect_after_handshake_error, reconnect_fixture, network_gen, all_non_ssl_streams)
 {
     // Error during server handshake
     this->params.set_database("bad_database");
@@ -81,20 +81,20 @@ BOOST_MYSQL_NETWORK_TEST(reconnect_after_physical_connect_error, reconnect_fixtu
     this->do_query_ok(sample.net);
 }
 
-BOOST_MYSQL_NETWORK_TEST_EX(reconnect_after_ssl_handshake_error, reconnect_fixture, network_gen, all_ssl_streams)
-{
-    // Error during SSL certificate validation
-    this->conn.next_layer().set_verify_mode(boost::asio::ssl::verify_peer);
-    auto result = sample.net->connect(this->conn, get_endpoint<Stream>(endpoint_kind::localhost), this->params);
-    BOOST_TEST(result.err.message() == "certificate verify failed");
-    BOOST_TEST(!this->conn.uses_ssl());
+// BOOST_MYSQL_NETWORK_TEST_EX(reconnect_after_ssl_handshake_error, reconnect_fixture, network_gen, all_ssl_streams)
+// {
+//     // Error during SSL certificate validation
+//     this->conn.next_layer().set_verify_mode(boost::asio::ssl::verify_peer);
+//     auto result = sample.net->connect(this->conn, get_endpoint<Stream>(endpoint_kind::localhost), this->params);
+//     BOOST_TEST(result.err.message() == "certificate verify failed");
+//     BOOST_TEST(!this->conn.uses_ssl());
 
-    // Disable certificate validation and use the connection normally
-    this->conn.next_layer().set_verify_mode(boost::asio::ssl::verify_none);
-    this->do_connect_ok(sample.net);
-    BOOST_TEST(this->conn.uses_ssl());
-    this->do_query_ok(sample.net);
-}
+//     // Disable certificate validation and use the connection normally
+//     this->conn.next_layer().set_verify_mode(boost::asio::ssl::verify_none);
+//     this->do_connect_ok(sample.net);
+//     BOOST_TEST(this->conn.uses_ssl());
+//     this->do_query_ok(sample.net);
+// }
 
 BOOST_AUTO_TEST_SUITE_END() // test_reconnect
 

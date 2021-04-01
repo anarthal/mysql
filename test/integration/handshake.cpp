@@ -54,7 +54,7 @@ void do_handshake_ok(
 {
     network_result<no_result> result = do_handshake(conn, params, net, ssl);
     result.validate_no_error();
-    validate_ssl(conn);
+    validate_ssl(conn, ssl);
 }
 
 template <class Stream>
@@ -248,13 +248,14 @@ BOOST_MYSQL_NETWORK_TEST_EX(certificate_valid, network_fixture, network_gen, all
 {
     this->ssl_ctx.set_verify_mode(boost::asio::ssl::verify_peer);
     this->ssl_ctx.add_certificate_authority(boost::asio::buffer(CA_PEM));
+    this->recreate_connection();
     this->physical_connect();
     do_handshake_ok(this->conn, this->params, sample.net, ssl_mode::require);
 }
 
 BOOST_MYSQL_NETWORK_TEST_EX(certificate_invalid, network_fixture, network_gen, all_ssl_streams)
 {
-    this->ssl_ctx.set_verify_mode(boost::asio::ssl::verify_peer);
+    this->conn.next_layer().set_verify_mode(boost::asio::ssl::verify_peer);
     this->physical_connect();
     auto result = do_handshake(this->conn, this->params, sample.net, ssl_mode::require);
     BOOST_TEST(result.err.message() == "certificate verify failed");
@@ -265,6 +266,7 @@ BOOST_MYSQL_NETWORK_TEST_EX(custom_certificate_verification_failed, network_fixt
     this->ssl_ctx.set_verify_mode(boost::asio::ssl::verify_peer);
     this->ssl_ctx.add_certificate_authority(boost::asio::buffer(CA_PEM));
     this->ssl_ctx.set_verify_callback(boost::asio::ssl::host_name_verification("host.name"));
+    this->recreate_connection();
     this->physical_connect();
     auto result = do_handshake(this->conn, this->params, sample.net, ssl_mode::require);
     BOOST_TEST(result.err.message() == "certificate verify failed");
@@ -275,6 +277,7 @@ BOOST_MYSQL_NETWORK_TEST_EX(custom_certificate_verification_ok, network_fixture,
     this->ssl_ctx.set_verify_mode(boost::asio::ssl::verify_peer);
     this->ssl_ctx.add_certificate_authority(boost::asio::buffer(CA_PEM));
     this->ssl_ctx.set_verify_callback(boost::asio::ssl::host_name_verification("mysql"));
+    this->recreate_connection();
     this->physical_connect();
     do_handshake_ok(this->conn, this->params, sample.net, ssl_mode::require);
 }

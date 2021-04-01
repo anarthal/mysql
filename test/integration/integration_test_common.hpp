@@ -14,6 +14,7 @@
 #include <boost/test/unit_test.hpp>
 #include <thread>
 #include <type_traits>
+#include "boost/mysql/connection_params.hpp"
 #include "test_common.hpp"
 #include "metadata_validator.hpp"
 #include "network_functions.hpp"
@@ -27,15 +28,16 @@ namespace test {
 
 // Verifies that we are or are not using SSL, depending on whether the stream supports it or not
 template <class Stream>
-void validate_ssl(const connection<Stream>& conn)
+void validate_ssl(const connection<Stream>& conn, ssl_mode m)
 {
-    BOOST_TEST(conn.uses_ssl() == supports_ssl<Stream>());
+    bool expected = (m == ssl_mode::require || m == ssl_mode::enable) && supports_ssl<Stream>();
+    BOOST_TEST(conn.uses_ssl() == expected);
 }
 
 // Helper to create a socket_connection<Stream> from a SSL context;
 // also usable for non-SSL streams
 template <class Stream>
-socket_connection<Stream> create_socket_connection(
+socket_connection<Stream> create_socket_connection_impl(
     boost::asio::io_context::executor_type executor,
     boost::asio::ssl::context& ssl_ctx,
     std::true_type // is ssl stream
@@ -45,13 +47,26 @@ socket_connection<Stream> create_socket_connection(
 }
 
 template <class Stream>
-socket_connection<Stream> create_socket_connection(
+socket_connection<Stream> create_socket_connection_impl(
     boost::asio::io_context::executor_type executor,
     boost::asio::ssl::context&,
     std::false_type // is ssl stream
 )
 {
     return socket_connection<Stream>(executor);
+}
+
+template <class Stream>
+socket_connection<Stream> create_socket_connection(
+    boost::asio::io_context::executor_type executor,
+    boost::asio::ssl::context& ssl_ctx
+)
+{
+    return create_socket_connection_impl<Stream>(
+        executor, 
+        ssl_ctx, 
+        std::integral_constant<bool, supports_ssl<Stream>()>()
+    );
 }
 
 
@@ -76,7 +91,7 @@ struct network_fixture
     network_fixture() :
         params("integ_user", "integ_password", "boost_mysql_integtests"),
         ssl_ctx(boost::asio::ssl::context::tls_client),
-        conn(create_socket_connection<Stream>(ctx.get_executor(), ssl_ctx, std::integral_constant<bool, supports_ssl<Stream>()>())),
+        conn(create_socket_connection<Stream>(ctx.get_executor(), ssl_ctx)),
         guard(ctx.get_executor()),
         runner([this] { ctx.run(); })
     {
@@ -102,11 +117,17 @@ struct network_fixture
         conn.next_layer().lowest_layer().connect(get_endpoint<Stream>(endpoint_kind::localhost));
     }
 
+    // Used by tests that modify the SSL context parameters
+    void recreate_connection()
+    {
+        this->conn = create_socket_connection<Stream>(ctx.get_executor(), ssl_ctx);
+    }
+
     void handshake(ssl_mode m = ssl_mode::require)
     {
         params.set_ssl(m);
         conn.handshake(params);
-        validate_ssl(conn);
+        validate_ssl(conn, m);
     }
 
     void connect(ssl_mode m = ssl_mode::require)
