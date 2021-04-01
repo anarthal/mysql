@@ -9,9 +9,9 @@
 #define BOOST_MYSQL_TEST_INTEGRATION_NETWORK_FUNCTIONS_HPP
 
 #include <boost/mysql/socket_connection.hpp>
-#include "stream_list.hpp"
 #include <forward_list>
 #include <boost/optional/optional.hpp>
+#include "../stream_list.hpp"
 
 /**
  * A mechanism to test all variants of a network algorithm (e.g. synchronous
@@ -107,12 +107,24 @@ public:
     virtual network_result<no_result> close(connection_type&) = 0;
 };
 
-template <class Stream>
-const std::vector<network_functions<Stream>*>& all_network_functions();
-
 } // test
 } // mysql
 } // boost
+
+#ifdef BOOST_ASIO_HAS_LOCAL_SOCKETS
+#define BOOST_MYSQL_NETFN_EXTERN_TEMPLATE_UNIX(cls) \
+    extern template class cls<unix_socket>; \
+    extern template class cls<unix_ssl_socket>;
+#else
+#define BOOST_MYSQL_NETFN_EXTERN_TEMPLATE_UNIX(cls)
+#endif
+
+#define BOOST_MYSQL_NETFN_EXTERN_TEMPLATE(cls) \
+    extern template class cls<tcp_socket>; \
+    extern template class cls<tcp_ssl_socket>; \
+    extern template class cls<tcp_future_socket>; \
+    extern template class cls<tcp_ssl_future_socket>; \
+    BOOST_MYSQL_NETFN_EXTERN_TEMPLATE_UNIX(cls)
 
 
 

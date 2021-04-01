@@ -5,22 +5,18 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
+#ifndef BOOST_MYSQL_TEST_INTEGRATION_NETWORK_FUNCTIONS_NETWORK_plah2_IMPL_HPP
+#define BOOST_MYSQL_TEST_INTEGRATION_NETWORK_FUNCTIONS_NETWORK_plah2_IMPL_HPP
 
 #include <boost/mysql/execute_params.hpp>
-#include "network_functions_impl.hpp"
-#include <boost/asio/use_future.hpp>
 #include <boost/test/unit_test.hpp>
+#include <thread>
 
-using namespace boost::mysql::test;
-using boost::mysql::connection_params;
-using boost::mysql::execute_params;
-using boost::mysql::error_code;
-using boost::mysql::error_info;
-using boost::mysql::value;
-using boost::mysql::row;
+#include "network_functions.hpp"
 
-namespace
-{
+namespace boost {
+namespace mysql {
+namespace test {
 
 class handler_call_tracker
 {
@@ -344,23 +340,11 @@ public:
     }
 };
 
-} // anon namespace
+BOOST_MYSQL_NETFN_EXTERN_TEMPLATE(async_callback_errinfo);
+BOOST_MYSQL_NETFN_EXTERN_TEMPLATE(async_callback_noerrinfo);
 
-// Visible stuff
-template <class Stream>
-network_functions<Stream>* boost::mysql::test::async_callback_errinfo_functions()
-{
-    static async_callback_errinfo<Stream> res;
-    return &res;
-}
+} // boost
+} // mysql
+} // test
 
-template <class Stream>
-network_functions<Stream>* boost::mysql::test::async_callback_noerrinfo_functions()
-{
-    static async_callback_noerrinfo<Stream> res;
-    return &res;
-}
-
-BOOST_MYSQL_INSTANTIATE_NETWORK_FUNCTIONS(async_callback_errinfo_functions)
-BOOST_MYSQL_INSTANTIATE_NETWORK_FUNCTIONS(async_callback_noerrinfo_functions)
-
+#endif

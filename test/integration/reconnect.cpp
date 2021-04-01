@@ -13,7 +13,6 @@
 #include "boost/mysql/errc.hpp"
 #include "get_endpoint.hpp"
 #include "integration_test_common.hpp"
-#include "network_functions.hpp"
 
 using namespace boost::mysql::test;
 using boost::mysql::ssl_mode;

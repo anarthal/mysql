@@ -5,22 +5,14 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-// Both sync_errc and sync_exc are implemented here, as the resulting
-// template instantiations are almost identical
+#ifndef BOOST_MYSQL_TEST_INTEGRATION_NETWORK_FUNCTIONS_NETWORK_plah_IMPL_HPP
+#define BOOST_MYSQL_TEST_INTEGRATION_NETWORK_FUNCTIONS_NETWORK_plah_IMPL_HPP
 
-#include "network_functions_impl.hpp"
+#include "network_functions.hpp"
 
-using namespace boost::mysql::test;
-using boost::mysql::connection_params;
-using boost::mysql::error_code;
-using boost::mysql::error_info;
-using boost::mysql::errc;
-using boost::mysql::value;
-using boost::mysql::execute_params;
-using boost::mysql::row;
-
-namespace
-{
+namespace boost {
+namespace mysql {
+namespace test {
 
 template <class Stream>
 class sync_errc : public network_functions<Stream>
@@ -157,8 +149,6 @@ public:
             return no_result();
         });
     }
-
-    static sync_errc obj;
 };
 
 template <class Stream>
@@ -300,23 +290,11 @@ public:
     }
 };
 
-} // anon namespace
+BOOST_MYSQL_NETFN_EXTERN_TEMPLATE(sync_errc)
+BOOST_MYSQL_NETFN_EXTERN_TEMPLATE(sync_exc)
 
-// Visible stuff
-template <class Stream>
-network_functions<Stream>* boost::mysql::test::sync_errc_functions()
-{
-    static sync_errc<Stream> res;
-    return &res;
+}
+}
 }
 
-template <class Stream>
-network_functions<Stream>* boost::mysql::test::sync_exc_functions()
-{
-    static sync_exc<Stream> res;
-    return &res;
-}
-
-BOOST_MYSQL_INSTANTIATE_NETWORK_FUNCTIONS(sync_errc_functions)
-BOOST_MYSQL_INSTANTIATE_NETWORK_FUNCTIONS(sync_exc_functions)
-
+#endif

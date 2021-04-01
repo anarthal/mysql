@@ -31,36 +31,33 @@ using unix_ssl_socket = boost::asio::ssl::stream<unix_socket>;
 
 // Stream lists
 using all_non_ssl_streams = boost::mp11::mp_list<
-    tcp_socket,
 #ifdef BOOST_ASIO_HAS_LOCAL_SOCKETS
     unix_socket,
 #endif
-    tcp_future_socket
+    tcp_socket
 >;
 
 using all_ssl_streams = boost::mp11::mp_list<
-    tcp_ssl_socket,
 #ifdef BOOST_ASIO_HAS_LOCAL_SOCKETS
     unix_ssl_socket,
 #endif
+    tcp_ssl_socket,
     tcp_ssl_future_socket
 >;
 
 using all_streams = boost::mp11::mp_list<
-    tcp_socket,
-    tcp_ssl_socket,
 #ifdef BOOST_ASIO_HAS_LOCAL_SOCKETS
     unix_socket,
     unix_ssl_socket,
 #endif
-    tcp_future_socket,
+    tcp_socket,
+    tcp_ssl_socket,
     tcp_ssl_future_socket
 >;
 
 // Stream names
 template <class Stream> constexpr const char* get_stream_name();
 template <> constexpr const char* get_stream_name<tcp_socket>() { return "tcp"; }
-template <> constexpr const char* get_stream_name<tcp_future_socket>() { return "tcp_default_token"; }
 template <> constexpr const char* get_stream_name<tcp_ssl_socket>() { return "tcp_ssl"; }
 template <> constexpr const char* get_stream_name<tcp_ssl_future_socket>() { return "tcp_ssl_default_token"; }
 
@@ -72,7 +69,6 @@ template <> constexpr const char* get_stream_name<unix_ssl_socket>() { return "u
 // Supports SSL (doesn't use the lib's type trait for test independance)
 template <class Stream> constexpr bool supports_ssl();
 template <> constexpr bool supports_ssl<tcp_socket>() { return false; }
-template <> constexpr bool supports_ssl<tcp_future_socket>() { return false; }
 template <> constexpr bool supports_ssl<tcp_ssl_socket>() { return true; }
 template <> constexpr bool supports_ssl<tcp_ssl_future_socket>() { return true; }
 

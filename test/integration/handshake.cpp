@@ -10,7 +10,6 @@
 #include <boost/mysql/tcp_ssl.hpp>
 #include "boost/mysql/errc.hpp"
 #include "integration_test_common.hpp"
-#include "network_functions.hpp"
 #include "test_common.hpp"
 #include <boost/asio/ssl/error.hpp>
 #include <boost/asio/ssl/verify_mode.hpp>

@@ -5,24 +5,19 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#include "network_functions_impl.hpp"
+#ifndef BOOST_MYSQL_TEST_INTEGRATION_NETWORK_FUNCTIONS_NETWORK_plah8_IMPL_HPP
+#define BOOST_MYSQL_TEST_INTEGRATION_NETWORK_FUNCTIONS_NETWORK_plah8_IMPL_HPP
+
+#include "network_functions.hpp"
 #include <boost/asio/use_future.hpp>
 
-using namespace boost::mysql::test;
-using boost::mysql::connection_params;
-using boost::mysql::error_code;
-using boost::mysql::error_info;
-using boost::mysql::value;
-using boost::mysql::row;
-using boost::mysql::execute_params;
-using boost::asio::use_future;
-
-namespace
-{
+namespace boost {
+namespace mysql {
+namespace test {
 
 // Helpers
 template <class Callable>
-auto impl_errinfo(
+auto future_impl_errinfo(
     Callable&& cb
 ) -> network_result<decltype(cb(std::declval<error_info&>()).get())>
 {
@@ -45,7 +40,7 @@ auto impl_errinfo(
 }
 
 template <class Callable>
-network_result<no_result> impl_no_result_errinfo(
+network_result<no_result> future_impl_no_result_errinfo(
     Callable&& cb
 )
 {
@@ -63,7 +58,7 @@ network_result<no_result> impl_no_result_errinfo(
 }
 
 template <class Callable>
-auto impl_noerrinfo(
+auto future_impl_noerrinfo(
     Callable&& cb
 ) -> network_result<decltype(cb().get())>
 {
@@ -83,7 +78,7 @@ auto impl_noerrinfo(
 }
 
 template <class Callable>
-network_result<no_result> impl_no_result_noerrinfo(
+network_result<no_result> future_impl_no_result_noerrinfo(
     Callable&& cb
 )
 {
@@ -115,8 +110,8 @@ public:
         const connection_params& params
     ) override
     {
-        return impl_no_result_errinfo([&] (error_info& output_info) {
-            return conn.async_connect(ep, params, output_info, use_future);
+        return future_impl_no_result_errinfo([&] (error_info& output_info) {
+            return conn.async_connect(ep, params, output_info, boost::asio::use_future);
         });
     }
     network_result<no_result> handshake(
@@ -124,8 +119,8 @@ public:
         const connection_params& params
     ) override
     {
-        return impl_no_result_errinfo([&] (error_info& output_info) {
-            return conn.async_handshake(params, output_info, use_future);
+        return future_impl_no_result_errinfo([&] (error_info& output_info) {
+            return conn.async_handshake(params, output_info, boost::asio::use_future);
         });
     }
     network_result<resultset_type> query(
@@ -133,8 +128,8 @@ public:
         boost::string_view query
     ) override
     {
-        return impl_errinfo([&] (error_info& output_info) {
-            return conn.async_query(query, output_info, use_future);
+        return future_impl_errinfo([&] (error_info& output_info) {
+            return conn.async_query(query, output_info, boost::asio::use_future);
         });
     }
     network_result<prepared_statement_type> prepare_statement(
@@ -142,8 +137,8 @@ public:
         boost::string_view statement
     ) override
     {
-        return impl_errinfo([&] (error_info& output_info) {
-            return conn.async_prepare_statement(statement, output_info, use_future);
+        return future_impl_errinfo([&] (error_info& output_info) {
+            return conn.async_prepare_statement(statement, output_info, boost::asio::use_future);
         });
     }
     network_result<resultset_type> execute_statement(
@@ -151,8 +146,8 @@ public:
         const execute_params<value_list_it>& params
     ) override
     {
-        return impl_errinfo([&] (error_info& output_info) {
-            return stmt.async_execute(params, output_info, use_future);
+        return future_impl_errinfo([&] (error_info& output_info) {
+            return stmt.async_execute(params, output_info, boost::asio::use_future);
         });
     }
     network_result<resultset_type> execute_statement(
@@ -160,16 +155,16 @@ public:
         const std::vector<value>& values
     ) override
     {
-        return impl_errinfo([&] (error_info& output_info) {
-            return stmt.async_execute(values, output_info, use_future);
+        return future_impl_errinfo([&] (error_info& output_info) {
+            return stmt.async_execute(values, output_info, boost::asio::use_future);
         });
     }
     network_result<no_result> close_statement(
         prepared_statement_type& stmt
     ) override
     {
-        return impl_no_result_errinfo([&] (error_info& output_info) {
-            return stmt.async_close(output_info, use_future);
+        return future_impl_no_result_errinfo([&] (error_info& output_info) {
+            return stmt.async_close(output_info, boost::asio::use_future);
         });
     }
     network_result<bool> read_one(
@@ -177,8 +172,8 @@ public:
 		row& output
     ) override
     {
-        return impl_errinfo([&] (error_info& output_info) {
-            return r.async_read_one(output, output_info, use_future);
+        return future_impl_errinfo([&] (error_info& output_info) {
+            return r.async_read_one(output, output_info, boost::asio::use_future);
         });
     }
     network_result<std::vector<row>> read_many(
@@ -186,32 +181,32 @@ public:
         std::size_t count
     ) override
     {
-        return impl_errinfo([&] (error_info& output_info) {
-            return r.async_read_many(count, output_info, use_future);
+        return future_impl_errinfo([&] (error_info& output_info) {
+            return r.async_read_many(count, output_info, boost::asio::use_future);
         });
     }
     network_result<std::vector<row>> read_all(
         resultset_type& r
     ) override
     {
-        return impl_errinfo([&] (error_info& output_info) {
-            return r.async_read_all(output_info, use_future);
+        return future_impl_errinfo([&] (error_info& output_info) {
+            return r.async_read_all(output_info, boost::asio::use_future);
         });
     }
     network_result<no_result> quit(
         connection_type& conn
     ) override
     {
-        return impl_no_result_errinfo([&] (error_info& output_info) {
-            return conn.async_quit(output_info, use_future);
+        return future_impl_no_result_errinfo([&] (error_info& output_info) {
+            return conn.async_quit(output_info, boost::asio::use_future);
         });
     }
     network_result<no_result> close(
         connection_type& conn
     ) override
     {
-        return impl_no_result_errinfo([&] (error_info& output_info) {
-            return conn.async_close(output_info, use_future);
+        return future_impl_no_result_errinfo([&] (error_info& output_info) {
+            return conn.async_close(output_info, boost::asio::use_future);
         });
     }
 };
@@ -231,8 +226,8 @@ public:
         const connection_params& params
     ) override
     {
-        return impl_no_result_noerrinfo([&] {
-            return conn.async_connect(ep, params, use_future);
+        return future_impl_no_result_noerrinfo([&] {
+            return conn.async_connect(ep, params, boost::asio::use_future);
         });
     }
     network_result<no_result> handshake(
@@ -240,8 +235,8 @@ public:
         const connection_params& params
     ) override
     {
-        return impl_no_result_noerrinfo([&] {
-            return conn.async_handshake(params, use_future);
+        return future_impl_no_result_noerrinfo([&] {
+            return conn.async_handshake(params, boost::asio::use_future);
         });
     }
     network_result<resultset_type> query(
@@ -249,8 +244,8 @@ public:
         boost::string_view query
     ) override
     {
-        return impl_noerrinfo([&] {
-            return conn.async_query(query, use_future);
+        return future_impl_noerrinfo([&] {
+            return conn.async_query(query, boost::asio::use_future);
         });
     }
     network_result<prepared_statement_type> prepare_statement(
@@ -258,8 +253,8 @@ public:
         boost::string_view statement
     ) override
     {
-        return impl_noerrinfo([&]{
-            return conn.async_prepare_statement(statement, use_future);
+        return future_impl_noerrinfo([&]{
+            return conn.async_prepare_statement(statement, boost::asio::use_future);
         });
     }
     network_result<resultset_type> execute_statement(
@@ -267,8 +262,8 @@ public:
         const execute_params<value_list_it>& params
     ) override
     {
-        return impl_noerrinfo([&]{
-            return stmt.async_execute(params, use_future);
+        return future_impl_noerrinfo([&]{
+            return stmt.async_execute(params, boost::asio::use_future);
         });
     }
     network_result<resultset_type> execute_statement(
@@ -276,16 +271,16 @@ public:
         const std::vector<value>& values
     ) override
     {
-        return impl_noerrinfo([&] {
-            return stmt.async_execute(values, use_future);
+        return future_impl_noerrinfo([&] {
+            return stmt.async_execute(values, boost::asio::use_future);
         });
     }
     network_result<no_result> close_statement(
         prepared_statement_type& stmt
     ) override
     {
-        return impl_no_result_noerrinfo([&] {
-            return stmt.async_close(use_future);
+        return future_impl_no_result_noerrinfo([&] {
+            return stmt.async_close(boost::asio::use_future);
         });
     }
     network_result<bool> read_one(
@@ -293,8 +288,8 @@ public:
 		row& output
     ) override
     {
-        return impl_noerrinfo([&] {
-            return r.async_read_one(output, use_future);
+        return future_impl_noerrinfo([&] {
+            return r.async_read_one(output, boost::asio::use_future);
         });
     }
     network_result<std::vector<row>> read_many(
@@ -302,298 +297,155 @@ public:
         std::size_t count
     ) override
     {
-        return impl_noerrinfo([&] {
-            return r.async_read_many(count, use_future);
+        return future_impl_noerrinfo([&] {
+            return r.async_read_many(count, boost::asio::use_future);
         });
     }
     network_result<std::vector<row>> read_all(
         resultset_type& r
     ) override
     {
-        return impl_noerrinfo([&] {
-            return r.async_read_all(use_future);
+        return future_impl_noerrinfo([&] {
+            return r.async_read_all(boost::asio::use_future);
         });
     }
     network_result<no_result> quit(
         connection_type& conn
     ) override
     {
-        return impl_no_result_noerrinfo([&] {
-            return conn.async_quit(use_future);
+        return future_impl_no_result_noerrinfo([&] {
+            return conn.async_quit(boost::asio::use_future);
         });
     }
     network_result<no_result> close(
         connection_type& conn
     ) override
     {
-        return impl_no_result_noerrinfo([&] {
-            return conn.async_close(use_future);
+        return future_impl_no_result_noerrinfo([&] {
+            return conn.async_close(boost::asio::use_future);
         });
     }
 };
 
 // Default completion tokens
 template <>
-class async_future_errinfo<tcp_future_socket> : public network_functions<tcp_future_socket>
+class async_future_errinfo<tcp_ssl_future_socket> : public network_functions<tcp_ssl_future_socket>
 {
 public:
-    using connection_type = typename network_functions<tcp_future_socket>::connection_type;
-    using prepared_statement_type = typename network_functions<tcp_future_socket>::prepared_statement_type;
-    using resultset_type = typename network_functions<tcp_future_socket>::resultset_type;
+    using connection_type = typename network_functions<tcp_ssl_future_socket>::connection_type;
+    using prepared_statement_type = typename network_functions<tcp_ssl_future_socket>::prepared_statement_type;
+    using resultset_type = typename network_functions<tcp_ssl_future_socket>::resultset_type;
 
     const char* name() const override { return "async_future_errinfo"; }
     network_result<no_result> connect(
         connection_type& conn,
-        const typename tcp_future_socket::lowest_layer_type::endpoint_type& ep,
+        const typename tcp_ssl_future_socket::lowest_layer_type::endpoint_type& ep,
         const connection_params& params
-    ) override
-    {
-        return impl_no_result_errinfo([&] (error_info& output_info) {
-            return conn.async_connect(ep, params, output_info);
-        });
-    }
+    ) override;
     network_result<no_result> handshake(
         connection_type& conn,
         const connection_params& params
-    ) override
-    {
-        return impl_no_result_errinfo([&] (error_info& output_info) {
-            return conn.async_handshake(params, output_info);
-        });
-    }
+    ) override;
     network_result<resultset_type> query(
         connection_type& conn,
         boost::string_view query
-    ) override
-    {
-        return impl_errinfo([&] (error_info& output_info) {
-            return conn.async_query(query, output_info);
-        });
-    }
+    ) override;
     network_result<prepared_statement_type> prepare_statement(
         connection_type& conn,
         boost::string_view statement
-    ) override
-    {
-        return impl_errinfo([&] (error_info& output_info) {
-            return conn.async_prepare_statement(statement, output_info);
-        });
-    }
+    ) override;
     network_result<resultset_type> execute_statement(
         prepared_statement_type& stmt,
         const execute_params<value_list_it>& params
-    ) override
-    {
-        return impl_errinfo([&] (error_info& output_info) {
-            return stmt.async_execute(params, output_info);
-        });
-    }
+    ) override;
     network_result<resultset_type> execute_statement(
         prepared_statement_type& stmt,
         const std::vector<value>& values
-    ) override
-    {
-        return impl_errinfo([&] (error_info& output_info) {
-            return stmt.async_execute(values, output_info);
-        });
-    }
+    ) override;
     network_result<no_result> close_statement(
         prepared_statement_type& stmt
-    ) override
-    {
-        return impl_no_result_errinfo([&] (error_info& output_info) {
-            return stmt.async_close(output_info);
-        });
-    }
+    ) override;
     network_result<bool> read_one(
         resultset_type& r,
 		row& output
-    ) override
-    {
-        return impl_errinfo([&] (error_info& output_info) {
-            return r.async_read_one(output, output_info);
-        });
-    }
+    ) override;
     network_result<std::vector<row>> read_many(
         resultset_type& r,
         std::size_t count
-    ) override
-    {
-        return impl_errinfo([&] (error_info& output_info) {
-            return r.async_read_many(count, output_info);
-        });
-    }
+    ) override;
     network_result<std::vector<row>> read_all(
         resultset_type& r
-    ) override
-    {
-        return impl_errinfo([&] (error_info& output_info) {
-            return r.async_read_all(output_info);
-        });
-    }
+    ) override;
     network_result<no_result> quit(
         connection_type& conn
-    ) override
-    {
-        return impl_no_result_errinfo([&] (error_info& output_info) {
-            return conn.async_quit(output_info);
-        });
-    }
+    ) override;
     network_result<no_result> close(
         connection_type& conn
-    ) override
-    {
-        return impl_no_result_errinfo([&] (error_info& output_info) {
-            return conn.async_close(output_info);
-        });
-    }
+    ) override;
 };
 
 template <>
-class async_future_noerrinfo<tcp_future_socket> : public network_functions<tcp_future_socket>
+class async_future_noerrinfo<tcp_ssl_future_socket> : public network_functions<tcp_ssl_future_socket>
 {
 public:
-    using connection_type = typename network_functions<tcp_future_socket>::connection_type;
-    using prepared_statement_type = typename network_functions<tcp_future_socket>::prepared_statement_type;
-    using resultset_type = typename network_functions<tcp_future_socket>::resultset_type;
+    using connection_type = typename network_functions<tcp_ssl_future_socket>::connection_type;
+    using prepared_statement_type = typename network_functions<tcp_ssl_future_socket>::prepared_statement_type;
+    using resultset_type = typename network_functions<tcp_ssl_future_socket>::resultset_type;
 
     const char* name() const override { return "async_future_noerrinfo"; }
     network_result<no_result> connect(
         connection_type& conn,
-        const typename tcp_future_socket::lowest_layer_type::endpoint_type& ep,
+        const typename tcp_ssl_future_socket::lowest_layer_type::endpoint_type& ep,
         const connection_params& params
-    ) override
-    {
-        return impl_no_result_noerrinfo([&] {
-            return conn.async_connect(ep, params);
-        });
-    }
+    ) override;
     network_result<no_result> handshake(
         connection_type& conn,
         const connection_params& params
-    ) override
-    {
-        return impl_no_result_noerrinfo([&] {
-            return conn.async_handshake(params);
-        });
-    }
+    ) override;
     network_result<resultset_type> query(
         connection_type& conn,
         boost::string_view query
-    ) override
-    {
-        return impl_noerrinfo([&] {
-            return conn.async_query(query);
-        });
-    }
+    ) override;
     network_result<prepared_statement_type> prepare_statement(
         connection_type& conn,
         boost::string_view statement
-    ) override
-    {
-        return impl_noerrinfo([&]{
-            return conn.async_prepare_statement(statement);
-        });
-    }
+    ) override;
     network_result<resultset_type> execute_statement(
         prepared_statement_type& stmt,
         const execute_params<value_list_it>& params
-    ) override
-    {
-        return impl_noerrinfo([&]{
-            return stmt.async_execute(params);
-        });
-    }
+    ) override;
     network_result<resultset_type> execute_statement(
         prepared_statement_type& stmt,
         const std::vector<value>& values
-    ) override
-    {
-        return impl_noerrinfo([&] {
-            return stmt.async_execute(values);
-        });
-    }
+    ) override;
     network_result<no_result> close_statement(
         prepared_statement_type& stmt
-    ) override
-    {
-        return impl_no_result_noerrinfo([&] {
-            return stmt.async_close();
-        });
-    }
+    ) override;
     network_result<bool> read_one(
         resultset_type& r,
 		row& output
-    ) override
-    {
-        return impl_noerrinfo([&] {
-            return r.async_read_one(output);
-        });
-    }
+    ) override;
     network_result<std::vector<row>> read_many(
         resultset_type& r,
         std::size_t count
-    ) override
-    {
-        return impl_noerrinfo([&] {
-            return r.async_read_many(count);
-        });
-    }
+    ) override;
     network_result<std::vector<row>> read_all(
         resultset_type& r
-    ) override
-    {
-        return impl_noerrinfo([&] {
-            return r.async_read_all();
-        });
-    }
+    ) override;
     network_result<no_result> quit(
         connection_type& conn
-    ) override
-    {
-        return impl_no_result_noerrinfo([&] {
-            return conn.async_quit();
-        });
-    }
+    ) override;
     network_result<no_result> close(
         connection_type& conn
-    ) override
-    {
-        return impl_no_result_noerrinfo([&] {
-            return conn.async_close();
-        });
-    }
+    ) override;
 };
 
-} // anon namespace
+BOOST_MYSQL_NETFN_EXTERN_TEMPLATE(async_future_errinfo)
+BOOST_MYSQL_NETFN_EXTERN_TEMPLATE(async_future_noerrinfo)
 
-// Visible stuff
-template <class Stream>
-network_functions<Stream>* boost::mysql::test::async_future_errinfo_functions()
-{
-    static async_future_errinfo<Stream> res;
-    return &res;
-}
+} // test
+} // mysql
+} // boost
 
-template <class Stream>
-network_functions<Stream>* boost::mysql::test::async_future_noerrinfo_functions()
-{
-    static async_future_noerrinfo<Stream> res;
-    return &res;
-}
 
-BOOST_MYSQL_INSTANTIATE_NETWORK_FUNCTIONS(async_future_errinfo_functions)
-BOOST_MYSQL_INSTANTIATE_NETWORK_FUNCTIONS(async_future_noerrinfo_functions)
-
-template network_functions<tcp_future_socket>*
-boost::mysql::test::async_future_errinfo_functions<tcp_future_socket>();
-
-template network_functions<tcp_future_socket>*
-boost::mysql::test::async_future_noerrinfo_functions<tcp_future_socket>();
-
-template network_functions<tcp_ssl_future_socket>*
-boost::mysql::test::async_future_errinfo_functions<tcp_ssl_future_socket>();
-
-template network_functions<tcp_ssl_future_socket>*
-boost::mysql::test::async_future_noerrinfo_functions<tcp_ssl_future_socket>();
-
+#endif

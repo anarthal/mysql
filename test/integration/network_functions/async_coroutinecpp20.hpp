@@ -5,26 +5,20 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#include "network_functions_impl.hpp"
+#ifndef BOOST_MYSQL_TEST_INTEGRATION_NETWORK_FUNCTIONS_NETWORK_plah4_IMPL_HPP
+#define BOOST_MYSQL_TEST_INTEGRATION_NETWORK_FUNCTIONS_NETWORK_plah4_IMPL_HPP
+
+#ifdef BOOST_ASIO_HAS_CO_AWAIT
+
+#include "network_functions.hpp"
 #include <boost/asio/use_awaitable.hpp>
 #include <boost/asio/co_spawn.hpp>
 #include <boost/asio/detached.hpp>
 #include <future>
 
-#ifdef BOOST_ASIO_HAS_CO_AWAIT
-
-using namespace boost::mysql::test;
-using boost::mysql::connection_params;
-using boost::mysql::error_code;
-using boost::mysql::error_info;
-using boost::mysql::errc;
-using boost::mysql::value;
-using boost::mysql::row;
-using boost::mysql::execute_params;
-using boost::asio::use_awaitable;
-
-namespace
-{
+namespace boost {
+namespace mysql {
+namespace test {
 
 template <class Stream>
 class async_coroutinecpp20_errinfo : public network_functions<Stream>
@@ -91,7 +85,7 @@ public:
     ) override
     {
         return impl_no_result(conn, [&](error_info& info) {
-            return conn.async_connect(ep, params, info, use_awaitable);
+            return conn.async_connect(ep, params, info, boost::asio::use_awaitable);
         });
     }
     network_result<no_result> handshake(
@@ -100,7 +94,7 @@ public:
     ) override
     {
         return impl_no_result(conn, [&](error_info& info) {
-            return conn.async_handshake(params, info, use_awaitable);
+            return conn.async_handshake(params, info, boost::asio::use_awaitable);
         });
     }
     network_result<resultset_type> query(
@@ -109,7 +103,7 @@ public:
     ) override
     {
         return impl(conn, [&](error_info& info) {
-            return conn.async_query(query, info, use_awaitable);
+            return conn.async_query(query, info, boost::asio::use_awaitable);
         });
     }
     network_result<prepared_statement_type> prepare_statement(
@@ -118,7 +112,7 @@ public:
     ) override
     {
         return impl(conn, [&](error_info& info) {
-            return conn.async_prepare_statement(statement, info, use_awaitable);
+            return conn.async_prepare_statement(statement, info, boost::asio::use_awaitable);
         });
     }
     network_result<resultset_type> execute_statement(
@@ -127,7 +121,7 @@ public:
     ) override
     {
         return impl(stmt, [&](error_info& info) {
-            return stmt.async_execute(params, info, use_awaitable);
+            return stmt.async_execute(params, info, boost::asio::use_awaitable);
         });
     }
     network_result<resultset_type> execute_statement(
@@ -136,7 +130,7 @@ public:
     ) override
     {
         return impl(stmt, [&](error_info& info) {
-            return stmt.async_execute(values, info, use_awaitable);
+            return stmt.async_execute(values, info, boost::asio::use_awaitable);
         });
     }
     network_result<no_result> close_statement(
@@ -144,7 +138,7 @@ public:
     ) override
     {
         return impl_no_result(stmt, [&](error_info& info) {
-            return stmt.async_close(info, use_awaitable);
+            return stmt.async_close(info, boost::asio::use_awaitable);
         });
     }
     network_result<bool> read_one(
@@ -153,7 +147,7 @@ public:
     ) override
     {
         return impl(r, [&](error_info& info) {
-            return r.async_read_one(output, info, use_awaitable);
+            return r.async_read_one(output, info, boost::asio::use_awaitable);
         });
     }
     network_result<std::vector<row>> read_many(
@@ -162,7 +156,7 @@ public:
     ) override
     {
         return impl(r, [&](error_info& info) {
-            return r.async_read_many(count, info, use_awaitable);
+            return r.async_read_many(count, info, boost::asio::use_awaitable);
         });
     }
     network_result<std::vector<row>> read_all(
@@ -170,7 +164,7 @@ public:
     ) override
     {
         return impl(r, [&](error_info& info) {
-            return r.async_read_all(info, use_awaitable);
+            return r.async_read_all(info, boost::asio::use_awaitable);
         });
     }
     network_result<no_result> quit(
@@ -178,7 +172,7 @@ public:
     ) override
     {
         return impl_no_result(conn, [&](error_info& info) {
-            return conn.async_quit(info, use_awaitable);
+            return conn.async_quit(info, boost::asio::use_awaitable);
         });
     }
     network_result<no_result> close(
@@ -186,7 +180,7 @@ public:
     ) override
     {
         return impl_no_result(conn, [&](error_info& info) {
-            return conn.async_close(info, use_awaitable);
+            return conn.async_close(info, boost::asio::use_awaitable);
         });
     }
 };
@@ -253,7 +247,7 @@ public:
     ) override
     {
         return impl_no_result(conn, [&] {
-            return conn.async_connect(ep, params, use_awaitable);
+            return conn.async_connect(ep, params, boost::asio::use_awaitable);
         });
     }
     network_result<no_result> handshake(
@@ -262,7 +256,7 @@ public:
     ) override
     {
         return impl_no_result(conn, [&] {
-            return conn.async_handshake(params, use_awaitable);
+            return conn.async_handshake(params, boost::asio::use_awaitable);
         });
     }
     network_result<resultset_type> query(
@@ -271,7 +265,7 @@ public:
     ) override
     {
         return impl(conn, [&] {
-            return conn.async_query(query, use_awaitable);
+            return conn.async_query(query, boost::asio::use_awaitable);
         });
     }
     network_result<prepared_statement_type> prepare_statement(
@@ -280,7 +274,7 @@ public:
     ) override
     {
         return impl(conn, [&] {
-            return conn.async_prepare_statement(statement, use_awaitable);
+            return conn.async_prepare_statement(statement, boost::asio::use_awaitable);
         });
     }
     network_result<resultset_type> execute_statement(
@@ -289,7 +283,7 @@ public:
     ) override
     {
         return impl(stmt, [&] {
-            return stmt.async_execute(params, use_awaitable);
+            return stmt.async_execute(params, boost::asio::use_awaitable);
         });
     }
     network_result<resultset_type> execute_statement(
@@ -298,7 +292,7 @@ public:
     ) override
     {
         return impl(stmt, [&] {
-            return stmt.async_execute(values, use_awaitable);
+            return stmt.async_execute(values, boost::asio::use_awaitable);
         });
     }
     network_result<no_result> close_statement(
@@ -306,7 +300,7 @@ public:
     ) override
     {
         return impl_no_result(stmt, [&] {
-            return stmt.async_close(use_awaitable);
+            return stmt.async_close(boost::asio::use_awaitable);
         });
     }
     network_result<bool> read_one(
@@ -315,7 +309,7 @@ public:
     ) override
     {
         return impl(r, [&] {
-            return r.async_read_one(output, use_awaitable);
+            return r.async_read_one(output, boost::asio::use_awaitable);
         });
     }
     network_result<std::vector<row>> read_many(
@@ -324,7 +318,7 @@ public:
     ) override
     {
         return impl(r, [&] {
-            return r.async_read_many(count, use_awaitable);
+            return r.async_read_many(count, boost::asio::use_awaitable);
         });
     }
     network_result<std::vector<row>> read_all(
@@ -332,7 +326,7 @@ public:
     ) override
     {
         return impl(r, [&] {
-            return r.async_read_all(use_awaitable);
+            return r.async_read_all(boost::asio::use_awaitable);
         });
     }
     network_result<no_result> quit(
@@ -340,7 +334,7 @@ public:
     ) override
     {
         return impl_no_result(conn, [&] {
-            return conn.async_quit(use_awaitable);
+            return conn.async_quit(boost::asio::use_awaitable);
         });
     }
     network_result<no_result> close(
@@ -348,30 +342,18 @@ public:
     ) override
     {
         return impl_no_result(conn, [&] {
-            return conn.async_close(use_awaitable);
+            return conn.async_close(boost::asio::use_awaitable);
         });
     }
 };
 
-} // anon namespace
+BOOST_MYSQL_NETFN_EXTERN_TEMPLATE(async_coroutinecpp20_errinfo)
+BOOST_MYSQL_NETFN_EXTERN_TEMPLATE(async_coroutinecpp20_noerrinfo)
 
-// Visible stuff
-// Visible stuff
-template <class Stream>
-network_functions<Stream>* boost::mysql::test::async_coroutinecpp20_errinfo_functions()
-{
-    static async_coroutinecpp20_errinfo<Stream> res;
-    return &res;
-}
-
-template <class Stream>
-network_functions<Stream>* boost::mysql::test::async_coroutinecpp20_noerrinfo_functions()
-{
-    static async_coroutinecpp20_noerrinfo<Stream> res;
-    return &res;
-}
-
-BOOST_MYSQL_INSTANTIATE_NETWORK_FUNCTIONS(async_coroutinecpp20_errinfo_functions)
-BOOST_MYSQL_INSTANTIATE_NETWORK_FUNCTIONS(async_coroutinecpp20_noerrinfo_functions)
+} // test
+} // mysql
+} // boost
 
 #endif // BOOST_ASIO_HAS_CO_AWAIT
+
+#endif

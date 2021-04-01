@@ -75,12 +75,12 @@ endif()
 # Integration testing
 add_executable(
     boost_mysql_integrationtests
-    integration/network_functions/network_functions_impl.cpp
-    integration/network_functions/sync.cpp
-    integration/network_functions/async_callback.cpp
-    integration/network_functions/async_coroutine.cpp
-    integration/network_functions/async_coroutinecpp20.cpp
-    integration/network_functions/async_future.cpp
+    integration/network_functions/impl/network_functions.cpp
+    integration/network_functions/impl/tcp.cpp
+    integration/network_functions/impl/tcp_ssl.cpp
+    integration/network_functions/impl/unix.cpp
+    integration/network_functions/impl/unix_ssl.cpp
+    integration/network_functions/impl/tcp_ssl_future.cpp
     integration/metadata_validator.cpp
     integration/connection.cpp
     integration/connect.cpp
