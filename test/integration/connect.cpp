@@ -14,7 +14,7 @@ using boost::mysql::error_code;
 
 BOOST_AUTO_TEST_SUITE(test_connect)
 
-BOOST_MYSQL_NETWORK_TEST(physical_and_handshake_ok, network_fixture, network_ssl_gen)
+BOOST_MYSQL_NETWORK_TEST(physical_and_handshake_ok, network_fixture, network_gen)
 {
     auto ep = get_endpoint<Stream>(endpoint_kind::localhost);
     auto result = sample.net->connect(this->conn, ep, this->params);
@@ -26,7 +26,7 @@ BOOST_MYSQL_NETWORK_TEST(physical_and_handshake_ok, network_fixture, network_ssl
     query_result.value.read_all(); // discard any result
 }
 
-BOOST_MYSQL_NETWORK_TEST(physical_error, network_fixture, network_ssl_gen)
+BOOST_MYSQL_NETWORK_TEST(physical_error, network_fixture, network_gen)
 {
     auto ep = get_endpoint<Stream>(endpoint_kind::inexistent);
     auto result = sample.net->connect(this->conn, ep, this->params);
@@ -35,7 +35,7 @@ BOOST_MYSQL_NETWORK_TEST(physical_error, network_fixture, network_ssl_gen)
     BOOST_TEST(!this->conn.next_layer().is_open());
 }
 
-BOOST_MYSQL_NETWORK_TEST(physical_ok_handshake_error, network_fixture, network_ssl_gen)
+BOOST_MYSQL_NETWORK_TEST(physical_ok_handshake_error, network_fixture, network_gen)
 {
     auto ep = get_endpoint<Stream>(endpoint_kind::localhost);
     this->set_credentials("integ_user", "bad_password");

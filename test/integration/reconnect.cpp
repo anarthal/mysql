@@ -25,12 +25,11 @@ struct reconnect_fixture : network_fixture<Stream>
 {
     using network_fixture<Stream>::network_fixture;
 
-    void do_connect_ok(network_functions<Stream>* net, ssl_mode m)
+    void do_connect_ok(network_functions<Stream>* net)
     {
-        this->params.set_ssl(m);
         auto result = net->connect(this->conn, get_endpoint<Stream>(endpoint_kind::localhost), this->params);
         result.validate_no_error();
-        validate_ssl(this->conn, m);
+        validate_ssl(this->conn);
     }
 
     void do_query_ok(network_functions<Stream>* net)
@@ -43,19 +42,10 @@ struct reconnect_fixture : network_fixture<Stream>
     }
 };
 
-template <class Stream>
-struct reconnect_fixture_external_ctx : reconnect_fixture<Stream>
-{
-    reconnect_fixture_external_ctx(): reconnect_fixture<Stream>(use_external_ctx) {}
-};
-
-// Using default SSL context
-BOOST_AUTO_TEST_SUITE(default_ssl_ctx)
-
-BOOST_MYSQL_NETWORK_TEST(reconnect_after_close, reconnect_fixture, network_ssl_gen)
+BOOST_MYSQL_NETWORK_TEST(reconnect_after_close, reconnect_fixture, network_gen)
 {
     // Connect and use the connection
-    this->do_connect_ok(sample.net, sample.ssl);
+    this->do_connect_ok(sample.net);
     this->do_query_ok(sample.net);
 
     // Close
@@ -63,97 +53,48 @@ BOOST_MYSQL_NETWORK_TEST(reconnect_after_close, reconnect_fixture, network_ssl_g
     result.validate_no_error();
 
     // Reopen and use the connection normally
-    this->do_connect_ok(sample.net, sample.ssl);
+    this->do_connect_ok(sample.net);
     this->do_query_ok(sample.net);
 }
 
-BOOST_MYSQL_NETWORK_TEST(reconnect_after_handshake_error, reconnect_fixture, network_ssl_gen)
+BOOST_MYSQL_NETWORK_TEST(reconnect_after_handshake_error, reconnect_fixture, network_gen)
 {
     // Error during server handshake
-    this->params.set_ssl(sample.ssl);
     this->params.set_database("bad_database");
     auto result = sample.net->connect(this->conn, get_endpoint<Stream>(endpoint_kind::localhost), this->params);
     result.validate_error(boost::mysql::errc::dbaccess_denied_error, {"database", "bad_database"});
 
     // Reopen with correct parameters and use the connection normally
     this->params.set_database("boost_mysql_integtests");
-    this->do_connect_ok(sample.net, sample.ssl);
+    this->do_connect_ok(sample.net);
     this->do_query_ok(sample.net);
 }
 
-BOOST_MYSQL_NETWORK_TEST(reconnect_after_physical_connect_error, reconnect_fixture, network_ssl_gen)
+BOOST_MYSQL_NETWORK_TEST(reconnect_after_physical_connect_error, reconnect_fixture, network_gen)
 {
     // Error during connection
-    this->params.set_ssl(sample.ssl);
     auto result = sample.net->connect(this->conn, get_endpoint<Stream>(endpoint_kind::inexistent), this->params);
     result.validate_any_error({"physical connect failed"});
 
     // Reopen with and use the connection normally
-    this->do_connect_ok(sample.net, sample.ssl);
+    this->do_connect_ok(sample.net);
     this->do_query_ok(sample.net);
 }
 
-BOOST_AUTO_TEST_SUITE_END()
-
-// Using custom SSL context
-BOOST_AUTO_TEST_SUITE(external_ssl_ctx)
-
-BOOST_MYSQL_NETWORK_TEST(reconnect_after_close, reconnect_fixture_external_ctx, network_ssl_gen)
-{
-    // Connect and use the connection
-    this->do_connect_ok(sample.net, sample.ssl);
-    this->do_query_ok(sample.net);
-
-    // Close
-    auto result = sample.net->close(this->conn);
-    result.validate_no_error();
-
-    // Reopen and use the connection normally
-    this->do_connect_ok(sample.net, sample.ssl);
-    this->do_query_ok(sample.net);
-}
-
-BOOST_MYSQL_NETWORK_TEST(reconnect_after_handshake_error, reconnect_fixture_external_ctx, network_ssl_gen)
-{
-    // Error during server handshake
-    this->params.set_ssl(sample.ssl);
-    this->params.set_database("bad_database");
-    auto result = sample.net->connect(this->conn, get_endpoint<Stream>(endpoint_kind::localhost), this->params);
-    result.validate_error(boost::mysql::errc::dbaccess_denied_error, {"database", "bad_database"});
-
-    // Reopen with correct parameters and use the connection normally
-    this->params.set_database("boost_mysql_integtests");
-    this->do_connect_ok(sample.net, sample.ssl);
-    this->do_query_ok(sample.net);
-}
-
-BOOST_MYSQL_NETWORK_TEST(reconnect_after_physical_connect_error, reconnect_fixture_external_ctx, network_ssl_gen)
-{
-    // Error during connection
-    this->params.set_ssl(sample.ssl);
-    auto result = sample.net->connect(this->conn, get_endpoint<Stream>(endpoint_kind::inexistent), this->params);
-    result.validate_any_error({"physical connect failed"});
-
-    // Reopen with and use the connection normally
-    this->do_connect_ok(sample.net, sample.ssl);
-    this->do_query_ok(sample.net);
-}
-
-BOOST_MYSQL_NETWORK_TEST(reconnect_after_ssl_handshake_error, reconnect_fixture_external_ctx, network_gen)
+BOOST_MYSQL_NETWORK_TEST_EX(reconnect_after_ssl_handshake_error, reconnect_fixture, network_gen, all_ssl_streams)
 {
     // Error during SSL certificate validation
-    this->external_ctx.set_verify_mode(boost::asio::ssl::verify_peer);
-    this->params.set_ssl(boost::mysql::ssl_mode::require);
+    this->conn.next_layer().set_verify_mode(boost::asio::ssl::verify_peer);
     auto result = sample.net->connect(this->conn, get_endpoint<Stream>(endpoint_kind::localhost), this->params);
     BOOST_TEST(result.err.message() == "certificate verify failed");
+    BOOST_TEST(!this->conn.uses_ssl());
 
     // Disable certificate validation and use the connection normally
-    this->external_ctx.set_verify_mode(boost::asio::ssl::verify_none);
-    this->do_connect_ok(sample.net, boost::mysql::ssl_mode::require);
+    this->conn.next_layer().set_verify_mode(boost::asio::ssl::verify_none);
+    this->do_connect_ok(sample.net);
+    BOOST_TEST(this->conn.uses_ssl());
     this->do_query_ok(sample.net);
 }
-
-BOOST_AUTO_TEST_SUITE_END() // external ssl ctx
 
 BOOST_AUTO_TEST_SUITE_END() // test_reconnect
 

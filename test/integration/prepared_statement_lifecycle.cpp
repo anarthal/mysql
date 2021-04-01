@@ -23,9 +23,9 @@ value get_updates_table_value(
             .read_all().at(0).values().at(0);
 }
 
-BOOST_MYSQL_NETWORK_TEST(select_with_parameters_multiple_executions, network_fixture, network_ssl_gen)
+BOOST_MYSQL_NETWORK_TEST(select_with_parameters_multiple_executions, network_fixture, network_gen)
 {
-    this->connect(sample.ssl);
+    this->connect();
     auto* net = sample.net;
 
     // Prepare a statement
@@ -67,9 +67,9 @@ BOOST_MYSQL_NETWORK_TEST(select_with_parameters_multiple_executions, network_fix
     close_result.validate_no_error();
 }
 
-BOOST_MYSQL_NETWORK_TEST(insert_with_parameters_multiple_executions, network_fixture, network_ssl_gen)
+BOOST_MYSQL_NETWORK_TEST(insert_with_parameters_multiple_executions, network_fixture, network_gen)
 {
-    this->connect(sample.ssl);
+    this->connect();
     this->start_transaction();
     auto* net = sample.net;
 
@@ -102,9 +102,9 @@ BOOST_MYSQL_NETWORK_TEST(insert_with_parameters_multiple_executions, network_fix
     close_result.validate_no_error();
 }
 
-BOOST_MYSQL_NETWORK_TEST(update_with_parameters_multiple_executions, network_fixture, network_ssl_gen)
+BOOST_MYSQL_NETWORK_TEST(update_with_parameters_multiple_executions, network_fixture, network_gen)
 {
-    this->connect(sample.ssl);
+    this->connect();
     this->start_transaction();
     auto* net = sample.net;
 
@@ -140,9 +140,9 @@ BOOST_MYSQL_NETWORK_TEST(update_with_parameters_multiple_executions, network_fix
     close_result.validate_no_error();
 }
 
-BOOST_MYSQL_NETWORK_TEST(multiple_statements, network_fixture, network_ssl_gen)
+BOOST_MYSQL_NETWORK_TEST(multiple_statements, network_fixture, network_gen)
 {
-    this->connect(sample.ssl);
+    this->connect();
     this->start_transaction();
     auto* net = sample.net;
 
@@ -198,9 +198,9 @@ BOOST_MYSQL_NETWORK_TEST(multiple_statements, network_fixture, network_ssl_gen)
     close_result.validate_no_error();
 }
 
-BOOST_MYSQL_NETWORK_TEST(insert_with_null_values, network_fixture, network_ssl_gen)
+BOOST_MYSQL_NETWORK_TEST(insert_with_null_values, network_fixture, network_gen)
 {
-    this->connect(sample.ssl);
+    this->connect();
     this->start_transaction();
     auto* net = sample.net;
 

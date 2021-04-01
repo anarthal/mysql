@@ -6,6 +6,7 @@
 //
 
 #include <boost/mysql/resultset.hpp>
+#include <boost/mysql/tcp.hpp>
 #include <boost/mysql/detail/protocol/channel.hpp>
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/asio/strand.hpp>

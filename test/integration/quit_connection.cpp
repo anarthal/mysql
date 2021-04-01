@@ -12,9 +12,9 @@ using boost::mysql::error_code;
 
 BOOST_AUTO_TEST_SUITE(test_quit_connection)
 
-BOOST_MYSQL_NETWORK_TEST(active_connection, network_fixture, network_ssl_gen)
+BOOST_MYSQL_NETWORK_TEST(active_connection, network_fixture, network_gen)
 {
-    this->connect(sample.ssl);
+    this->connect();
 
     // Quit
     auto result = sample.net->quit(this->conn);

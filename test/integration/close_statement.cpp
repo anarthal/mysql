@@ -11,9 +11,9 @@ using namespace boost::mysql::test;
 
 BOOST_AUTO_TEST_SUITE(test_close_statement)
 
-BOOST_MYSQL_NETWORK_TEST(existing_or_closed_statement, network_fixture, network_ssl_gen)
+BOOST_MYSQL_NETWORK_TEST(existing_or_closed_statement, network_fixture, network_gen)
 {
-    this->connect(sample.ssl);
+    this->connect();
     auto* net = sample.net;
 
     // Prepare a statement

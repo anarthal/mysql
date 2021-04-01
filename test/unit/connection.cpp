@@ -6,6 +6,7 @@
 //
 
 #include <boost/mysql/connection.hpp>
+#include <boost/asio/ip/tcp.hpp>
 #include "test_stream.hpp"
 #include <boost/asio/strand.hpp>
 #include <boost/test/unit_test.hpp>

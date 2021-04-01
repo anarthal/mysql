@@ -15,9 +15,9 @@ using boost::mysql::errc;
 
 BOOST_AUTO_TEST_SUITE(test_query)
 
-BOOST_MYSQL_NETWORK_TEST(insert_ok, network_fixture, network_ssl_gen)
+BOOST_MYSQL_NETWORK_TEST(insert_ok, network_fixture, network_gen)
 {
-    this->connect(sample.ssl);
+    this->connect();
     this->start_transaction();
 
     // Issue query
@@ -38,9 +38,9 @@ BOOST_MYSQL_NETWORK_TEST(insert_ok, network_fixture, network_ssl_gen)
     BOOST_TEST(this->get_table_size("inserts_table") == 1);
 }
 
-BOOST_MYSQL_NETWORK_TEST(insert_error, network_fixture, network_ssl_gen)
+BOOST_MYSQL_NETWORK_TEST(insert_error, network_fixture, network_gen)
 {
-    this->connect(sample.ssl);
+    this->connect();
     this->start_transaction();
     auto result = sample.net->query(this->conn,
         "INSERT INTO bad_table (field_varchar, field_date) VALUES ('v0', '2010-10-11')");
@@ -48,9 +48,9 @@ BOOST_MYSQL_NETWORK_TEST(insert_error, network_fixture, network_ssl_gen)
     BOOST_TEST(!result.value.valid());
 }
 
-BOOST_MYSQL_NETWORK_TEST(update_ok, network_fixture, network_ssl_gen)
+BOOST_MYSQL_NETWORK_TEST(update_ok, network_fixture, network_gen)
 {
-    this->connect(sample.ssl);
+    this->connect();
     this->start_transaction();
 
     // Issue the query
@@ -75,9 +75,9 @@ BOOST_MYSQL_NETWORK_TEST(update_ok, network_fixture, network_ssl_gen)
     BOOST_TEST(updated_value == 52); // initial value was 42
 }
 
-BOOST_MYSQL_NETWORK_TEST(select_ok, network_fixture, network_ssl_gen)
+BOOST_MYSQL_NETWORK_TEST(select_ok, network_fixture, network_gen)
 {
-    this->connect(sample.ssl);
+    this->connect();
     auto result = sample.net->query(this->conn, "SELECT * FROM empty_table");
     result.validate_no_error();
     BOOST_TEST(result.value.valid());
@@ -85,9 +85,9 @@ BOOST_MYSQL_NETWORK_TEST(select_ok, network_fixture, network_ssl_gen)
     this->validate_2fields_meta(result.value, "empty_table");
 }
 
-BOOST_MYSQL_NETWORK_TEST(select_error, network_fixture, network_ssl_gen)
+BOOST_MYSQL_NETWORK_TEST(select_error, network_fixture, network_gen)
 {
-    this->connect(sample.ssl);
+    this->connect();
     auto result = sample.net->query(this->conn,
         "SELECT field_varchar, field_bad FROM one_row_table");
     result.validate_error(errc::bad_field_error, {"unknown column", "field_bad"});

@@ -11,6 +11,7 @@
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/asio/local/stream_protocol.hpp>
 #include <stdexcept>
+#include <utility>
 
 namespace boost {
 namespace mysql {
@@ -22,11 +23,11 @@ enum class endpoint_kind
     inexistent
 };
 
-template <class Protocol, class Executor>
+template <class Protocol>
 struct endpoint_getter;
 
-template <class Executor>
-struct endpoint_getter<boost::asio::ip::tcp, Executor>
+template <>
+struct endpoint_getter<boost::asio::ip::tcp>
 {
     boost::asio::ip::tcp::endpoint operator()(endpoint_kind kind)
     {
@@ -46,8 +47,8 @@ struct endpoint_getter<boost::asio::ip::tcp, Executor>
 };
 
 #ifdef BOOST_ASIO_HAS_LOCAL_SOCKETS
-template <class Executor>
-struct endpoint_getter<boost::asio::local::stream_protocol, Executor>
+template <>
+struct endpoint_getter<boost::asio::local::stream_protocol>
 {
     boost::asio::local::stream_protocol::endpoint operator()(endpoint_kind kind)
     {
@@ -72,7 +73,7 @@ typename Stream::endpoint_type get_endpoint(
     endpoint_kind kind
 )
 {
-    return endpoint_getter<typename Stream::protocol_type, typename Stream::executor_type>()(kind);
+    return endpoint_getter<typename Stream::lowest_layer_type::protocol_type>()(kind);
 }
 
 

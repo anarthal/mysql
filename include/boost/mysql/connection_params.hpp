@@ -64,7 +64,7 @@ public:
         boost::string_view password,
         boost::string_view db = "",
         collation connection_col = collation::utf8_general_ci,
-        ssl_mode mode = ssl_mode::enable
+        ssl_mode mode = ssl_mode::require
     ) :
         username_(username),
         password_(password),

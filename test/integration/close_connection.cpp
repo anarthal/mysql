@@ -12,10 +12,10 @@ using boost::mysql::error_code;
 
 BOOST_AUTO_TEST_SUITE(test_close_connection)
 
-BOOST_MYSQL_NETWORK_TEST(active_connection, network_fixture, network_ssl_gen)
+BOOST_MYSQL_NETWORK_TEST(active_connection, network_fixture, network_gen)
 {
     // Connect
-    this->connect(sample.ssl);
+    this->connect();
 
     // Close
     auto result = sample.net->close(this->conn);
@@ -29,10 +29,10 @@ BOOST_MYSQL_NETWORK_TEST(active_connection, network_fixture, network_ssl_gen)
     BOOST_TEST(!this->conn.next_layer().is_open());
 }
 
-BOOST_MYSQL_NETWORK_TEST(double_close, network_fixture, network_ssl_gen)
+BOOST_MYSQL_NETWORK_TEST(double_close, network_fixture, network_gen)
 {
     // Connect
-    this->connect(sample.ssl);
+    this->connect();
 
     // Close
     auto result = sample.net->close(this->conn);
@@ -49,7 +49,7 @@ BOOST_MYSQL_NETWORK_TEST(double_close, network_fixture, network_ssl_gen)
     BOOST_TEST(!this->conn.next_layer().is_open());
 }
 
-BOOST_MYSQL_NETWORK_TEST(not_open_connection, network_fixture, network_ssl_gen)
+BOOST_MYSQL_NETWORK_TEST(not_open_connection, network_fixture, network_gen)
 {
     auto result = sample.net->close(this->conn);
     result.validate_no_error();

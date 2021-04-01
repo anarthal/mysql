@@ -8,33 +8,52 @@
 #ifndef BOOST_MYSQL_TEST_INTEGRATION_INTEGRATION_TEST_COMMON_HPP
 #define BOOST_MYSQL_TEST_INTEGRATION_INTEGRATION_TEST_COMMON_HPP
 
+#include <boost/asio/ssl/context.hpp>
 #include <boost/mysql/socket_connection.hpp>
 #include <boost/asio/io_context.hpp>
-#include <boost/asio/ssl/context.hpp>
 #include <boost/test/unit_test.hpp>
 #include <thread>
+#include <type_traits>
 #include "test_common.hpp"
 #include "metadata_validator.hpp"
 #include "network_functions.hpp"
 #include "get_endpoint.hpp"
 #include "network_test.hpp"
+#include "stream_list.hpp"
 
 namespace boost {
 namespace mysql {
 namespace test {
 
-// Verifies that we are or are not using SSL, depending on what mode was requested.
+// Verifies that we are or are not using SSL, depending on whether the stream supports it or not
 template <class Stream>
-void validate_ssl(const connection<Stream>& conn, ssl_mode m)
+void validate_ssl(const connection<Stream>& conn)
 {
-    // All our test systems MUST support SSL to run these tests
-    bool should_use_ssl =
-        m == ssl_mode::enable || m == ssl_mode::require;
-    BOOST_TEST(conn.uses_ssl() == should_use_ssl);
+    BOOST_TEST(conn.uses_ssl() == supports_ssl<Stream>());
 }
 
-struct use_external_ctx_t {};
-constexpr use_external_ctx_t use_external_ctx {};
+// Helper to create a socket_connection<Stream> from a SSL context;
+// also usable for non-SSL streams
+template <class Stream>
+socket_connection<Stream> create_socket_connection(
+    boost::asio::io_context::executor_type executor,
+    boost::asio::ssl::context& ssl_ctx,
+    std::true_type // is ssl stream
+)
+{
+    return socket_connection<Stream>(executor, ssl_ctx);
+}
+
+template <class Stream>
+socket_connection<Stream> create_socket_connection(
+    boost::asio::io_context::executor_type executor,
+    boost::asio::ssl::context&,
+    std::false_type // is ssl stream
+)
+{
+    return socket_connection<Stream>(executor);
+}
+
 
 /**
  * Base fixture to use in integration tests. The fixture constructor creates
@@ -47,24 +66,16 @@ struct network_fixture
 {
     using stream_type = Stream;
 
-    boost::asio::ssl::context external_ctx {boost::asio::ssl::context::tls_client}; // for external ctx tests
     connection_params params;
     boost::asio::io_context ctx;
+    boost::asio::ssl::context ssl_ctx;
     socket_connection<Stream> conn;
     boost::asio::executor_work_guard<boost::asio::io_context::executor_type> guard;
     std::thread runner;
 
     network_fixture() :
         params("integ_user", "integ_password", "boost_mysql_integtests"),
-        conn(ctx.get_executor()),
-        guard(ctx.get_executor()),
-        runner([this] { ctx.run(); })
-    {
-    }
-
-    network_fixture(use_external_ctx_t) :
-        params("integ_user", "integ_password", "boost_mysql_integtests"),
-        conn(external_ctx, ctx.get_executor()),
+        conn(create_socket_connection<Stream>(ctx.get_executor(), ssl_ctx)),
         guard(ctx.get_executor()),
         runner([this] { ctx.run(); })
     {
@@ -97,7 +108,7 @@ struct network_fixture
         validate_ssl(conn, m);
     }
 
-    void connect(ssl_mode m)
+    void connect(ssl_mode m = ssl_mode::require)
     {
         physical_connect();
         handshake(m);
@@ -165,7 +176,7 @@ std::ostream& operator<<(std::ostream& os, const network_sample<Stream>& value)
 struct network_gen
 {
     template <class Stream>
-    static std::vector<network_sample<Stream>> make_all()
+    static const std::vector<network_sample<Stream>>& generate()
     {
         std::vector<network_sample<Stream>> res;
         for (auto* net: all_network_functions<Stream>())
@@ -174,67 +185,8 @@ struct network_gen
         }
         return res;
     }
-
-    template <class Stream>
-    static const std::vector<network_sample<Stream>>& generate()
-    {
-        static std::vector<network_sample<Stream>> res = make_all<Stream>();
-        return res;
-    }
 };
 
-// To be used as sample in data driven tests,
-// when a test should be run over
-// all network_function's and ssl_mode's
-template <class Stream>
-struct network_ssl_sample
-{
-    network_functions<Stream>* net;
-    ssl_mode ssl;
-
-    network_ssl_sample(network_functions<Stream>* funs, ssl_mode ssl) :
-        net(funs),
-        ssl(ssl)
-    {
-    }
-
-    void set_test_attributes(boost::unit_test::test_case& test) const
-    {
-        test.add_label(net->name());
-        test.add_label(to_string(ssl));
-    }
-};
-
-template <class Stream>
-std::ostream& operator<<(std::ostream& os, const network_ssl_sample<Stream>& value)
-{
-    return os << value.net->name() << '_' << to_string(value.ssl);
-}
-
-// Data generator for network_ssl_sample
-struct network_ssl_gen
-{
-    template <class Stream>
-    static std::vector<network_ssl_sample<Stream>> make_all()
-    {
-        std::vector<network_ssl_sample<Stream>> res;
-        for (auto* net: all_network_functions<Stream>())
-        {
-            for (auto ssl: {ssl_mode::require, ssl_mode::disable})
-            {
-                res.emplace_back(net, ssl);
-            }
-        }
-        return res;
-    }
-
-    template <class Stream>
-    static const std::vector<network_ssl_sample<Stream>>& generate()
-    {
-        static auto res = make_all<Stream>();
-        return res;
-    }
-};
 
 } // test
 } // mysql

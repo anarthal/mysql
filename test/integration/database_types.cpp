@@ -60,7 +60,7 @@ struct database_types_fixture : network_fixture<boost::asio::ip::tcp::socket>
 {
     database_types_fixture()
     {
-        connect(boost::mysql::ssl_mode::disable);
+        this->connect();
     }
 };
 

@@ -6,11 +6,12 @@
 //
 
 #include <boost/mysql/resultset.hpp>
+#include <boost/mysql/tcp.hpp>
 #include <boost/mysql/row.hpp>
 #include "integration_test_common.hpp"
 #include "test_common.hpp"
-#include <boost/asio/ip/tcp.hpp>
 #include <boost/test/unit_test_suite.hpp>
+#include <boost/asio/ip/tcp.hpp>
 
 using namespace boost::mysql::test;
 using boost::mysql::error_code;
@@ -18,8 +19,8 @@ using boost::mysql::ssl_mode;
 using boost::mysql::connection;
 using boost::mysql::resultset;
 using boost::mysql::row;
-using boost::asio::ip::tcp;
 using boost::mysql::tcp_resultset;
+using boost::asio::ip::tcp;
 
 BOOST_AUTO_TEST_SUITE(test_resultset)
 
@@ -98,12 +99,10 @@ template <class Stream>
 struct resultset_sample
 {
     network_functions<Stream>* net;
-    ssl_mode ssl;
     resultset_generator<Stream>* gen;
 
-    resultset_sample(network_functions<Stream>* funs, ssl_mode ssl, resultset_generator<Stream>* gen):
+    resultset_sample(network_functions<Stream>* funs, resultset_generator<Stream>* gen):
         net(funs),
-        ssl(ssl),
         gen(gen)
     {
     }
@@ -111,7 +110,6 @@ struct resultset_sample
     void set_test_attributes(boost::unit_test::test_case& test) const
     {
         test.add_label(net->name());
-        test.add_label(to_string(ssl));
     }
 };
 
@@ -126,7 +124,7 @@ std::ostream& operator<<(std::ostream& os, const resultset_sample<Stream>& input
 struct sample_gen
 {
     template <class Stream>
-    static std::vector<resultset_sample<Stream>> make_all()
+    static const std::vector<resultset_sample<Stream>>& generate()
     {
         static text_resultset_generator<Stream> text_obj;
         static binary_resultset_generator<Stream> binary_obj;
@@ -135,29 +133,15 @@ struct sample_gen
             &text_obj,
             &binary_obj
         };
-        ssl_mode all_ssl_modes [] = {
-            ssl_mode::disable,
-            ssl_mode::require
-        };
 
         std::vector<resultset_sample<Stream>> res;
         for (auto* net: all_network_functions<Stream>())
         {
-            for (auto ssl: all_ssl_modes)
+            for (auto* gen: all_resultset_generators)
             {
-                for (auto* gen: all_resultset_generators)
-                {
-                    res.emplace_back(net, ssl, gen);
-                }
+                res.emplace_back(net, gen);
             }
         }
-        return res;
-    }
-
-    template <class Stream>
-    static const std::vector<resultset_sample<Stream>>& generate()
-    {
-        static auto res = make_all<Stream>();
         return res;
     }
 };
@@ -172,7 +156,7 @@ static row make_initial_row()
 
 BOOST_MYSQL_NETWORK_TEST(no_results, network_fixture, sample_gen)
 {
-    this->connect(sample.ssl);
+    this->connect();
     auto result = sample.gen->generate(this->conn,
         "SELECT * FROM empty_table");
     BOOST_TEST(result.valid());
@@ -198,7 +182,7 @@ BOOST_MYSQL_NETWORK_TEST(no_results, network_fixture, sample_gen)
 
 BOOST_MYSQL_NETWORK_TEST(one_row, network_fixture, sample_gen)
 {
-    this->connect(sample.ssl);
+    this->connect();
     auto result = sample.gen->generate(this->conn,
         "SELECT * FROM one_row_table");
     BOOST_TEST(result.valid());
@@ -225,7 +209,7 @@ BOOST_MYSQL_NETWORK_TEST(one_row, network_fixture, sample_gen)
 
 BOOST_MYSQL_NETWORK_TEST(two_rows, network_fixture, sample_gen)
 {
-    this->connect(sample.ssl);
+    this->connect();
     auto result = sample.gen->generate(this->conn,
         "SELECT * FROM two_rows_table");
     BOOST_TEST(result.valid());
@@ -267,7 +251,7 @@ BOOST_AUTO_TEST_SUITE(read_many)
 
 BOOST_MYSQL_NETWORK_TEST(no_results, network_fixture, sample_gen)
 {
-    this->connect(sample.ssl);
+    this->connect();
     auto result = sample.gen->generate(this->conn,
         "SELECT * FROM empty_table");
 
@@ -286,7 +270,7 @@ BOOST_MYSQL_NETWORK_TEST(no_results, network_fixture, sample_gen)
 
 BOOST_MYSQL_NETWORK_TEST(more_rows_than_count, network_fixture, sample_gen)
 {
-    this->connect(sample.ssl);
+    this->connect();
     auto result = sample.gen->generate(this->conn,
         "SELECT * FROM three_rows_table");
 
@@ -305,7 +289,7 @@ BOOST_MYSQL_NETWORK_TEST(more_rows_than_count, network_fixture, sample_gen)
 
 BOOST_MYSQL_NETWORK_TEST(less_rows_than_count, network_fixture, sample_gen)
 {
-    this->connect(sample.ssl);
+    this->connect();
     auto result = sample.gen->generate(this->conn,
         "SELECT * FROM two_rows_table");
 
@@ -318,7 +302,7 @@ BOOST_MYSQL_NETWORK_TEST(less_rows_than_count, network_fixture, sample_gen)
 
 BOOST_MYSQL_NETWORK_TEST(same_rows_as_count, network_fixture, sample_gen)
 {
-    this->connect(sample.ssl);
+    this->connect();
     auto result = sample.gen->generate(this->conn,
         "SELECT * FROM two_rows_table");
 
@@ -337,7 +321,7 @@ BOOST_MYSQL_NETWORK_TEST(same_rows_as_count, network_fixture, sample_gen)
 
 BOOST_MYSQL_NETWORK_TEST(count_equals_one, network_fixture, sample_gen)
 {
-    this->connect(sample.ssl);
+    this->connect();
     auto result = sample.gen->generate(this->conn,
         "SELECT * FROM one_row_table");
 
@@ -354,7 +338,7 @@ BOOST_AUTO_TEST_SUITE(read_all)
 
 BOOST_MYSQL_NETWORK_TEST(no_results, network_fixture, sample_gen)
 {
-    this->connect(sample.ssl);
+    this->connect();
     auto result = sample.gen->generate(this->conn,
         "SELECT * FROM empty_table");
 
@@ -373,7 +357,7 @@ BOOST_MYSQL_NETWORK_TEST(no_results, network_fixture, sample_gen)
 
 BOOST_MYSQL_NETWORK_TEST(one_row, network_fixture, sample_gen)
 {
-    this->connect(sample.ssl);
+    this->connect();
     auto result = sample.gen->generate(this->conn,
         "SELECT * FROM one_row_table");
 
@@ -385,7 +369,7 @@ BOOST_MYSQL_NETWORK_TEST(one_row, network_fixture, sample_gen)
 
 BOOST_MYSQL_NETWORK_TEST(several_rows, network_fixture, sample_gen)
 {
-    this->connect(sample.ssl);
+    this->connect();
     auto result = sample.gen->generate(this->conn,
         "SELECT * FROM two_rows_table");
 
@@ -404,7 +388,7 @@ BOOST_AUTO_TEST_SUITE(move_operations)
 BOOST_FIXTURE_TEST_CASE(move_ctor, network_fixture<tcp::socket>)
 {
     // Get a valid resultset and perform a move construction
-    this->connect(boost::mysql::ssl_mode::disable);
+    this->connect();
     tcp_resultset r = this->conn.query("SELECT * FROM one_row_table");
     tcp_resultset r2 (std::move(r));
 
@@ -421,7 +405,7 @@ BOOST_FIXTURE_TEST_CASE(move_ctor, network_fixture<tcp::socket>)
 BOOST_FIXTURE_TEST_CASE(move_assignment_to_invalid, network_fixture<tcp::socket>)
 {
     // Get a valid resultset and perform a move assignment
-    this->connect(boost::mysql::ssl_mode::disable);
+    this->connect();
     tcp_resultset r = this->conn.query("SELECT * FROM one_row_table");
     tcp_resultset r2;
     r2 = std::move(r);
@@ -439,7 +423,7 @@ BOOST_FIXTURE_TEST_CASE(move_assignment_to_invalid, network_fixture<tcp::socket>
 BOOST_FIXTURE_TEST_CASE(move_assignment_to_valid, network_fixture<tcp::socket>)
 {
     // Get a valid resultset and perform a move assignment
-    this->connect(boost::mysql::ssl_mode::disable);
+    this->connect();
     tcp_resultset r2 = this->conn.query("SELECT * FROM empty_table");
     r2.read_all(); // clean any remaining packets
     tcp_resultset r = this->conn.query("SELECT * FROM one_row_table");

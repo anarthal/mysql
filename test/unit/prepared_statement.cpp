@@ -6,6 +6,7 @@
 //
 
 #include <boost/mysql/detail/protocol/channel.hpp>
+#include <boost/mysql/tcp.hpp>
 #include "test_common.hpp"
 #include "test_stream.hpp"
 #include <boost/mysql/prepared_statement.hpp>

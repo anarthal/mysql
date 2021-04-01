@@ -33,9 +33,9 @@ prepared_statement<Stream> do_prepare(
 }
 
 // Iterator version
-BOOST_MYSQL_NETWORK_TEST(iterator_ok_no_params, network_fixture, network_ssl_gen)
+BOOST_MYSQL_NETWORK_TEST(iterator_ok_no_params, network_fixture, network_gen)
 {
-    this->connect(sample.ssl);
+    this->connect();
     std::forward_list<value> params;
     auto stmt = do_prepare(sample.net, this->conn, "SELECT * FROM empty_table");
     auto result = sample.net->execute_statement(stmt, make_execute_params(params)); // execute
@@ -43,9 +43,9 @@ BOOST_MYSQL_NETWORK_TEST(iterator_ok_no_params, network_fixture, network_ssl_gen
     BOOST_TEST(result.value.valid());
 }
 
-BOOST_MYSQL_NETWORK_TEST(iterator_ok_with_params, network_fixture, network_ssl_gen)
+BOOST_MYSQL_NETWORK_TEST(iterator_ok_with_params, network_fixture, network_gen)
 {
-    this->connect(sample.ssl);
+    this->connect();
     std::forward_list<value> params { value("item"), value(42) };
     auto stmt = do_prepare(sample.net, this->conn,
         "SELECT * FROM empty_table WHERE id IN (?, ?)");
@@ -54,9 +54,9 @@ BOOST_MYSQL_NETWORK_TEST(iterator_ok_with_params, network_fixture, network_ssl_g
     BOOST_TEST(result.value.valid());
 }
 
-BOOST_MYSQL_NETWORK_TEST(iterator_mismatched_num_params, network_fixture, network_ssl_gen)
+BOOST_MYSQL_NETWORK_TEST(iterator_mismatched_num_params, network_fixture, network_gen)
 {
-    this->connect(sample.ssl);
+    this->connect();
     std::forward_list<value> params { value("item") };
     auto stmt = do_prepare<Stream>(
         sample.net,
@@ -69,9 +69,9 @@ BOOST_MYSQL_NETWORK_TEST(iterator_mismatched_num_params, network_fixture, networ
     BOOST_TEST(!result.value.valid());
 }
 
-BOOST_MYSQL_NETWORK_TEST(iterator_server_error, network_fixture, network_ssl_gen)
+BOOST_MYSQL_NETWORK_TEST(iterator_server_error, network_fixture, network_gen)
 {
-    this->connect(sample.ssl);
+    this->connect();
     this->start_transaction();
     std::forward_list<value> params { value("f0"), value("bad_date") };
     auto stmt = do_prepare(sample.net, this->conn,
@@ -83,27 +83,27 @@ BOOST_MYSQL_NETWORK_TEST(iterator_server_error, network_fixture, network_ssl_gen
 }
 
 // Container version
-BOOST_MYSQL_NETWORK_TEST(container_ok_no_params, network_fixture, network_ssl_gen)
+BOOST_MYSQL_NETWORK_TEST(container_ok_no_params, network_fixture, network_gen)
 {
-    this->connect(sample.ssl);
+    this->connect();
     auto stmt = do_prepare(sample.net, this->conn, "SELECT * FROM empty_table");
     auto result = sample.net->execute_statement(stmt, std::vector<value>()); // execute
     result.validate_no_error();
     BOOST_TEST(result.value.valid());
 }
 
-BOOST_MYSQL_NETWORK_TEST(container_ok_with_params, network_fixture, network_ssl_gen)
+BOOST_MYSQL_NETWORK_TEST(container_ok_with_params, network_fixture, network_gen)
 {
-    this->connect(sample.ssl);
+    this->connect();
     auto stmt = do_prepare(sample.net, this->conn, "SELECT * FROM empty_table WHERE id IN (?, ?)");
     auto result = sample.net->execute_statement(stmt, make_value_vector("item", 42));
     result.validate_no_error();
     BOOST_TEST(result.value.valid());
 }
 
-BOOST_MYSQL_NETWORK_TEST(container_mismatched_num_params, network_fixture, network_ssl_gen)
+BOOST_MYSQL_NETWORK_TEST(container_mismatched_num_params, network_fixture, network_gen)
 {
-    this->connect(sample.ssl);
+    this->connect();
     auto stmt = do_prepare(sample.net, this->conn,
         "SELECT * FROM empty_table WHERE id IN (?, ?)");
     auto result = sample.net->execute_statement(stmt, make_value_vector("item"));
@@ -112,9 +112,9 @@ BOOST_MYSQL_NETWORK_TEST(container_mismatched_num_params, network_fixture, netwo
     BOOST_TEST(!result.value.valid());
 }
 
-BOOST_MYSQL_NETWORK_TEST(container_server_error, network_fixture, network_ssl_gen)
+BOOST_MYSQL_NETWORK_TEST(container_server_error, network_fixture, network_gen)
 {
-    this->connect(sample.ssl);
+    this->connect();
     this->start_transaction();
     auto stmt = do_prepare(sample.net, this->conn,
         "INSERT INTO inserts_table (field_varchar, field_date) VALUES (?, ?)");
