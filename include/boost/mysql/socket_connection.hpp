@@ -189,16 +189,6 @@ public:
     };
 };
 
-/// A connection to MySQL over a TCP socket.
-using tcp_connection = socket_connection<boost::asio::ip::tcp::socket>;
-
-#if defined(BOOST_ASIO_HAS_LOCAL_SOCKETS) || defined(BOOST_MYSQL_DOXYGEN)
-
-/// A connection to MySQL over a UNIX domain socket.
-using unix_connection = socket_connection<boost::asio::local::stream_protocol::socket>;
-
-#endif
-
 } // mysql
 } // boost
 
