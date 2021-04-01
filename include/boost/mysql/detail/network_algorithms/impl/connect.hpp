@@ -14,10 +14,10 @@ namespace boost {
 namespace mysql {
 namespace detail {
 
-template<class Stream>
+template <class Stream>
 struct connect_op : boost::asio::coroutine
 {
-    using endpoint_type = typename Stream::endpoint_type;
+    using endpoint_type = typename Stream::lowest_layer_type::endpoint_type;
 
     channel<Stream>& chan_;
     error_info& output_info_;
@@ -46,7 +46,7 @@ struct connect_op : boost::asio::coroutine
         BOOST_ASIO_CORO_REENTER(*this)
         {
             // Physical connect
-            BOOST_ASIO_CORO_YIELD chan_.next_layer().async_connect(ep_, std::move(self));
+            BOOST_ASIO_CORO_YIELD chan_.lowest_layer().async_connect(ep_, std::move(self));
             if (code)
             {
                 chan_.close();
@@ -78,13 +78,13 @@ struct connect_op : boost::asio::coroutine
 template <class Stream>
 void boost::mysql::detail::connect(
     channel<Stream>& chan,
-    const typename Stream::endpoint_type& endpoint,
+    const typename Stream::lowest_layer_type::endpoint_type& endpoint,
     const connection_params& params,
     error_code& err,
     error_info& info
 )
 {
-    chan.next_layer().connect(endpoint, err);
+    chan.lowest_layer().connect(endpoint, err);
     if (err)
     {
         chan.close();
@@ -105,7 +105,7 @@ BOOST_ASIO_INITFN_AUTO_RESULT_TYPE(
 )
 boost::mysql::detail::async_connect(
     channel<Stream>& chan,
-    const typename Stream::endpoint_type& endpoint,
+    const typename Stream::lowest_layer_type::endpoint_type& endpoint,
     const connection_params& params,
     CompletionToken&& token,
     error_info& info

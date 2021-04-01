@@ -7,6 +7,7 @@
 
 //[example_unix_socket
 
+#include <boost/asio/ssl/context.hpp>
 #include <boost/mysql.hpp>
 #include <boost/asio/io_context.hpp>
 #include <boost/system/system_error.hpp>
@@ -61,13 +62,14 @@ void main_impl(int argc, char** argv)
     );
 
     boost::asio::io_context ctx;
+    boost::asio::ssl::context ssl_ctx (boost::asio::ssl::context::tls_client);
 
     // Connection to the MySQL server, over a UNIX socket
-    boost::mysql::unix_connection conn (ctx);
+    boost::mysql::unix_ssl_connection conn (ctx, ssl_ctx);
     conn.connect(ep, params); // UNIX socket connect and MySQL handshake
 
     const char* sql = "SELECT first_name, last_name, salary FROM employee WHERE company_id = 'HGS'";
-    boost::mysql::unix_resultset result = conn.query(sql);
+    boost::mysql::unix_ssl_resultset result = conn.query(sql);
 
     // Get all the rows in the resultset
     std::vector<boost::mysql::row> employees = result.read_all();

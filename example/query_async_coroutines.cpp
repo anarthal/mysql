@@ -7,6 +7,7 @@
 
 //[example_query_async_coroutines
 
+#include <boost/asio/ssl/context.hpp>
 #include <boost/mysql.hpp>
 #include <boost/asio/io_context.hpp>
 #include <boost/system/system_error.hpp>
@@ -47,7 +48,8 @@ void main_impl(int argc, char** argv)
 
     // Context and connections
     boost::asio::io_context ctx;
-    boost::mysql::tcp_connection conn (ctx);
+    boost::asio::ssl::context ssl_ctx (boost::asio::ssl::context::tls_client);
+    boost::mysql::tcp_ssl_connection conn (ctx, ssl_ctx); // MySQL 8's default config requires SSL
 
     boost::asio::ip::tcp::endpoint ep (
         boost::asio::ip::address_v4::loopback(), // host
@@ -61,7 +63,7 @@ void main_impl(int argc, char** argv)
 
     /**
      * The entry point. We spawn a stackful coroutine using boost::asio::spawn
-     * (see https://www.boost.org/doc/libs/1_72_0/doc/html/boost_asio/reference/spawn.html).
+     * (see https://www.boost.org/doc/libs/1_75_0/doc/html/boost_asio/reference/spawn.html).
      *
      * The coroutine will actually start running when we call io_context::run().
      * It will suspend every time we call one of the asynchronous functions, saving
@@ -86,7 +88,7 @@ void main_impl(int argc, char** argv)
 
         // Issue the query to the server
         const char* sql = "SELECT first_name, last_name, salary FROM employee WHERE company_id = 'HGS'";
-        boost::mysql::tcp_resultset result = conn.async_query(sql, additional_info, yield[ec]);
+        boost::mysql::tcp_ssl_resultset result = conn.async_query(sql, additional_info, yield[ec]);
         check_error(ec, additional_info);
 
         /**

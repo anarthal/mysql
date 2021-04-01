@@ -111,12 +111,15 @@ public:
     error_code close();
 
     // Sequence numbers
-    void reset_sequence_number(std::uint8_t value = 0) { sequence_number_ = value; }
-    std::uint8_t sequence_number() const { return sequence_number_; }
+    void reset_sequence_number(std::uint8_t value = 0) noexcept { sequence_number_ = value; }
+    std::uint8_t sequence_number() const noexcept { return sequence_number_; }
 
     // Getting the underlying stream
     using stream_type = Stream;
-    stream_type& next_layer() { return stream_; }
+    stream_type& next_layer() noexcept { return stream_; }
+
+    using lowest_layer_type = typename stream_type::lowest_layer_type;
+    lowest_layer_type& lowest_layer() noexcept { return stream_.lowest_layer(); }
 
     // Capabilities
     capabilities current_capabilities() const noexcept { return current_caps_; }

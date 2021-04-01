@@ -7,6 +7,7 @@
 
 //[example_query_async_futures
 
+#include <boost/asio/ssl/context.hpp>
 #include <boost/mysql.hpp>
 #include <boost/asio/io_context.hpp>
 #include <boost/system/system_error.hpp>
@@ -62,7 +63,8 @@ void main_impl(int argc, char** argv)
 
     // Context and connections
     application app; // boost::asio::io_context and a thread that calls run()
-    boost::mysql::tcp_connection conn (app.context());
+    boost::asio::ssl::context ssl_ctx (boost::asio::ssl::context::tls_client);
+    boost::mysql::tcp_ssl_connection conn (app.context(), ssl_ctx);
 
     boost::asio::ip::tcp::endpoint ep (
         boost::asio::ip::address_v4::loopback(), // host
@@ -86,8 +88,8 @@ void main_impl(int argc, char** argv)
 
     // Issue the query to the server
     const char* sql = "SELECT first_name, last_name, salary FROM employee WHERE company_id = 'HGS'";
-    std::future<boost::mysql::tcp_resultset> resultset_fut = conn.async_query(sql, use_future);
-    boost::mysql::tcp_resultset result = resultset_fut.get();
+    std::future<boost::mysql::tcp_ssl_resultset> resultset_fut = conn.async_query(sql, use_future);
+    boost::mysql::tcp_ssl_resultset result = resultset_fut.get();
 
     /**
       * Get all rows in the resultset. We will employ resultset::async_read_one(),

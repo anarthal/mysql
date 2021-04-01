@@ -83,18 +83,19 @@ public:
 using base_executor_type = boost::asio::io_context::executor_type;
 using coro_executor_type = boost::asio::use_awaitable_t<
     base_executor_type>::executor_with_default<base_executor_type>;
-using connection_type = boost::mysql::tcp_connection::rebind_executor<coro_executor_type>::other;
+using connection_type = boost::mysql::tcp_ssl_connection::rebind_executor<coro_executor_type>::other;
 
 // Our coroutine
 boost::asio::awaitable<void, base_executor_type> start_query(
     const boost::asio::io_context::executor_type& ex,
+    boost::asio::ssl::context& ssl_ctx,
     const boost::asio::ip::tcp::endpoint& ep,
     const boost::mysql::connection_params& params
 )
 {
     // Create the connection. We do not use the raw tcp_connection type
     // alias to default the completion token; see above.
-    connection_type conn (ex);
+    connection_type conn (ex, ssl_ctx);
 
     // Connect to server. Note: we didn't have to pass boost::asio::use_awaitable.
     co_await conn.async_connect(ep, params);
@@ -147,6 +148,7 @@ void main_impl(int argc, char** argv)
         argv[2],               // password
         "boost_mysql_examples" // database to use; leave empty or omit the parameter for no database
     );
+    boost::asio::ssl::context ssl_ctx;
 
     /**
      * The entry point. We spawn a thread of execution to run our
@@ -160,8 +162,8 @@ void main_impl(int argc, char** argv)
      */
     auto executor = app.context().get_executor();
     std::promise<void> prom;
-    boost::asio::co_spawn(executor, [executor, ep, params] {
-        return start_query(executor, ep, params);
+    boost::asio::co_spawn(executor, [executor, &ssl_ctx, ep, params] {
+        return start_query(executor, ssl_ctx, ep, params);
     }, [&prom](std::exception_ptr err) {
         prom.set_exception(std::move(err));
     });

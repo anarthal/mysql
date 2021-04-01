@@ -43,7 +43,7 @@ public:
     using executor_type = typename SocketStream::executor_type;
 
     /// The endpoint type associated to this connection.
-    using endpoint_type = typename SocketStream::endpoint_type;
+    using endpoint_type = typename SocketStream::lowest_layer_type::endpoint_type;
 
     /**
      * \brief Performs a connection to the MySQL server (sync with error code version).

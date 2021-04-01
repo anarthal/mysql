@@ -75,7 +75,8 @@ struct network_fixture
 
     network_fixture() :
         params("integ_user", "integ_password", "boost_mysql_integtests"),
-        conn(create_socket_connection<Stream>(ctx.get_executor(), ssl_ctx)),
+        ssl_ctx(boost::asio::ssl::context::tls_client),
+        conn(create_socket_connection<Stream>(ctx.get_executor(), ssl_ctx, std::integral_constant<bool, supports_ssl<Stream>()>())),
         guard(ctx.get_executor()),
         runner([this] { ctx.run(); })
     {

@@ -9,6 +9,7 @@
 #define BOOST_MYSQL_DETAIL_NETWORK_ALGORITHMS_IMPL_CLOSE_CONNECTION_HPP
 
 #include <boost/mysql/detail/network_algorithms/quit_connection.hpp>
+#include <boost/asio/post.hpp>
 
 template <class SocketStream>
 void boost::mysql::detail::close_connection(
@@ -18,7 +19,7 @@ void boost::mysql::detail::close_connection(
 )
 {
     // Close = quit + close stream. We close the stream regardless of the quit failing or not
-    if (chan.next_layer().is_open())
+    if (chan.lowest_layer().is_open())
     {
         quit_connection(chan, code, info);
         auto err = chan.close();
@@ -54,7 +55,7 @@ struct close_connection_op : boost::asio::coroutine
         error_code close_err;
         BOOST_ASIO_CORO_REENTER(*this)
         {
-            if (!chan_.next_layer().is_open())
+            if (!chan_.lowest_layer().is_open())
             {
                 BOOST_ASIO_CORO_YIELD boost::asio::post(std::move(self));
                 self.complete(error_code());

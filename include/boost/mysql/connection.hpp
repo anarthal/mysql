@@ -73,15 +73,10 @@ protected:
     error_info& shared_info() noexcept { return get_channel().shared_info(); }
 public:
     /**
-     * \brief Initializing constructor (no user-provided SSL context).
+     * \brief Initializing constructor.
      * \details
      * As part of the initialization, a Stream object is created
      * by forwarding any passed in arguments to its constructor.
-     * If SSL ends up being used for this connection, a
-     * [asioreflink ssl__context ssl::context] object will be created
-     * on-demmand, with the minimum configuration settings to make SSL work.
-     * In particular, no certificate validation will be performed. If you need
-     * more flexibility, have a look at the other constructor overloads.
      * 
      * The constructed connection will have [refmem connection valid]
      * return `true`.
@@ -91,33 +86,7 @@ public:
         class EnableIf = typename std::enable_if<std::is_constructible<Stream, Args...>::value>::type
     >
     connection(Args&&... args) :
-        channel_(new detail::channel<Stream>(nullptr, std::forward<Args>(args)...))
-    {
-    }
-
-    /**
-     * \brief Initializing constructor (user-provided SSL context).
-     * \details
-     * As part of the initialization, a Stream object is created
-     * by forwarding any passed in arguments to its constructor.
-     * If SSL ends up being used for this connection, `ctx` will be
-     * used to initialize a [asioreflink ssl__stream ssl::stream] object.
-     * By providing a SSL context you can specify extra SSL configuration options
-     * like certificate verification and hostname validation. You can use a single
-     * context in multiple connections.
-     *
-     * The provided context must be kept alive for the lifetime of the [reflink connection]
-     * object. Otherwise, the results are undefined.
-     * 
-     * The constructed connection will have [refmem connection valid]
-     * return `true`.
-     */
-    template<
-        class... Args,
-        class EnableIf = typename std::enable_if<std::is_constructible<Stream, Args...>::value>::type
-    >
-    connection(boost::asio::ssl::context& ctx, Args&&... args) :
-        channel_(new detail::channel<Stream>(&ctx, std::forward<Args>(args)...))
+        channel_(new detail::channel<Stream>(std::forward<Args>(args)...))
     {
     }
 

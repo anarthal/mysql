@@ -7,6 +7,7 @@
 
 //[example_metadata
 
+#include <boost/asio/ssl/context.hpp>
 #include <boost/mysql.hpp>
 #include <boost/asio/io_context.hpp>
 #include <boost/system/system_error.hpp>
@@ -31,9 +32,10 @@ void main_impl(int argc, char** argv)
     boost::asio::ip::tcp::endpoint ep (boost::asio::ip::address_v4::loopback(), boost::mysql::default_port);
     boost::mysql::connection_params params (argv[1], argv[2], "boost_mysql_examples");
 
-    // TCP and MySQL level connect
+    // TCP and MySQL level connect. We use SSL because MySQL 8+ default settings require it.
     boost::asio::io_context ctx;
-    boost::mysql::tcp_connection conn (ctx);
+    boost::asio::ssl::context ssl_ctx (boost::asio::ssl::context::tls_client);
+    boost::mysql::tcp_ssl_connection conn (ctx, ssl_ctx);
     conn.connect(ep, params);
 
     // Issue the query
@@ -42,7 +44,7 @@ void main_impl(int argc, char** argv)
         FROM employee emp
         JOIN company comp ON (comp.id = emp.company_id)
     )";
-    boost::mysql::tcp_resultset result = conn.query(sql);
+    boost::mysql::tcp_ssl_resultset result = conn.query(sql);
 
     /**
      * Resultsets allow you to access metadata about the fields in the query

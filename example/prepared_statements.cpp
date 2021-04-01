@@ -7,6 +7,7 @@
 
 //[example_prepared_statements
 
+#include <boost/asio/ssl/context.hpp>
 #include <boost/mysql.hpp>
 #include <boost/asio/io_context.hpp>
 #include <boost/system/system_error.hpp>
@@ -38,10 +39,12 @@ void main_impl(int argc, char** argv)
         "boost_mysql_examples" // database to use; leave empty or omit the parameter for no database
     );
 
-    boost::asio::io_context ctx;
 
     // Declare the connection object and authenticate to the server
-    boost::mysql::tcp_connection conn (ctx);
+    // We use SSL because MySQL 8+ default settings require it.
+    boost::asio::io_context ctx;
+    boost::asio::ssl::context ssl_ctx (boost::asio::ssl::context::tls_client);
+    boost::mysql::tcp_ssl_connection conn (ctx, ssl_ctx);
     conn.connect(ep, params);
 
     /**
@@ -54,18 +57,18 @@ void main_impl(int argc, char** argv)
      * Once a connection is closed, all prepared statements for that connection are deallocated.
      *
      * The result of prepare_statement is a mysql::prepared_statement object, which is
-     * templatized on the stream type of the connection (tcp_prepared_statement in our case).
+     * templatized on the stream type of the connection (tcp_ssl_prepared_statement in our case).
      *
      * We prepare two statements, a SELECT and an UPDATE.
      */
     //[prepared_statements_prepare
     const char* salary_getter_sql = "SELECT salary FROM employee WHERE first_name = ?";
-    boost::mysql::tcp_prepared_statement salary_getter = conn.prepare_statement(salary_getter_sql);
+    boost::mysql::tcp_ssl_prepared_statement salary_getter = conn.prepare_statement(salary_getter_sql);
     //]
     ASSERT(salary_getter.num_params() == 1); // num_params() returns the number of parameters (question marks)
 
     const char* salary_updater_sql = "UPDATE employee SET salary = ? WHERE first_name = ?";
-    boost::mysql::tcp_prepared_statement salary_updater = conn.prepare_statement(salary_updater_sql);
+    boost::mysql::tcp_ssl_prepared_statement salary_updater = conn.prepare_statement(salary_updater_sql);
     ASSERT(salary_updater.num_params() == 2);
 
     /*
@@ -86,7 +89,7 @@ void main_impl(int argc, char** argv)
      * An iterator version of execute() is also available.
      */
     //[prepared_statements_execute
-    boost::mysql::tcp_resultset result = salary_getter.execute(boost::mysql::make_values("Efficient"));
+    boost::mysql::tcp_ssl_resultset result = salary_getter.execute(boost::mysql::make_values("Efficient"));
     std::vector<boost::mysql::row> salaries = result.read_all(); // Get all the results
     //]
     ASSERT(salaries.size() == 1);

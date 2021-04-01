@@ -5,6 +5,7 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
+#include <boost/asio/ssl/context.hpp>
 #include <boost/mysql.hpp>
 #include <boost/asio/io_context.hpp>
 #include <boost/system/system_error.hpp>
@@ -28,7 +29,8 @@ void main_impl(int argc, char** argv)
 
     //[tutorial_connection
     boost::asio::io_context ctx;
-    boost::mysql::tcp_connection conn (ctx.get_executor());
+    boost::asio::ssl::context ssl_ctx (boost::asio::ssl::context::tls_client);
+    boost::mysql::tcp_ssl_connection conn (ctx.get_executor(), ssl_ctx);
     //]
 
     //[tutorial_connect
@@ -48,7 +50,7 @@ void main_impl(int argc, char** argv)
 
     //[tutorial_query
     const char* sql = "SELECT \"Hello world!\"";
-    boost::mysql::tcp_resultset result = conn.query(sql);
+    boost::mysql::tcp_ssl_resultset result = conn.query(sql);
     //]
 
     //[tutorial_read

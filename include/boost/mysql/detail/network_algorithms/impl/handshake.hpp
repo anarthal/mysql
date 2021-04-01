@@ -14,6 +14,7 @@
 #include <boost/mysql/detail/protocol/capabilities.hpp>
 #include <boost/mysql/detail/protocol/handshake_messages.hpp>
 #include <boost/mysql/detail/auth/auth_calculator.hpp>
+#include <boost/asio/post.hpp>
 #include <type_traits>
 
 namespace boost {
@@ -323,26 +324,30 @@ struct setup_ssl_op<Stream, true> : boost::asio::coroutine
         }
 
         // Non-error path
-        if (processor_.use_ssl())
+        BOOST_ASIO_CORO_REENTER(*this)
         {
-            // Send SSL request
-            processor_.compose_ssl_request(chan_.shared_buffer());
-            BOOST_ASIO_CORO_YIELD chan_.async_write(chan_.shared_buffer(), std::move(self));
+            // Non-error path
+            if (processor_.use_ssl())
+            {
+                // Send SSL request
+                processor_.compose_ssl_request(chan_.shared_buffer());
+                BOOST_ASIO_CORO_YIELD chan_.async_write(chan_.shared_buffer(), std::move(self));
 
-            // SSL handshake
-            BOOST_ASIO_CORO_YIELD chan_.next_layer().async_handshake(
-                boost::asio::ssl::stream_base::client, 
-                std::move(self)
-            );
-            chan_.set_ssl_active(true);
+                // SSL handshake
+                BOOST_ASIO_CORO_YIELD chan_.next_layer().async_handshake(
+                    boost::asio::ssl::stream_base::client, 
+                    std::move(self)
+                );
+                chan_.set_ssl_active(true);
+            }
+
+            self.complete(error_code());
         }
-
-        self.complete(error_code());
     }
 };
 
 template <class Stream>
-struct setup_ssl_op<Stream, false> : boost::asio::coroutine
+struct setup_ssl_op<Stream, false>
 {
     setup_ssl_op(
         channel<Stream>&,
@@ -377,7 +382,7 @@ async_setup_ssl(
         CompletionToken,
         void(error_code)
     >(
-        setup_ssl_op<Stream>(chan, processor),
+        setup_ssl_op<Stream, is_ssl_stream<Stream>::value>(chan, processor),
         token,
         chan
     );

@@ -7,6 +7,7 @@
 
 //[example_query_async_coroutinescpp20
 
+#include <boost/asio/ssl/context.hpp>
 #include <boost/mysql.hpp>
 #include <boost/asio/io_context.hpp>
 #include <boost/system/system_error.hpp>
@@ -83,19 +84,20 @@ public:
  */
 boost::asio::awaitable<void> start_query(
     const boost::asio::io_context::executor_type& ex,
+    boost::asio::ssl::context& ssl_ctx,
     const boost::asio::ip::tcp::endpoint& ep,
     const boost::mysql::connection_params& params
 )
 {
     // Create the connection
-    boost::mysql::tcp_connection conn (ex);
+    boost::mysql::tcp_ssl_connection conn (ex, ssl_ctx);
 
     // Connect to server
     co_await conn.async_connect(ep, params, boost::asio::use_awaitable);
 
     /**
      * Issue the query to the server. Note that async_query returns a
-     * boost::asio::awaitable<boost::mysql::tcp_resultset>.
+     * boost::asio::awaitable<boost::mysql::tcp_ssl_resultset>.
      */
     const char* sql = "SELECT first_name, last_name, salary FROM employee WHERE company_id = 'HGS'";
     auto result = co_await conn.async_query(sql, boost::asio::use_awaitable);
@@ -137,6 +139,7 @@ void main_impl(int argc, char** argv)
         argv[2],               // password
         "boost_mysql_examples" // database to use; leave empty or omit the parameter for no database
     );
+    boost::asio::ssl::context ssl_ctx (boost::asio::ssl::content::tls_client);
 
     /**
      * The entry point. We spawn a thread of execution to run our
@@ -150,8 +153,8 @@ void main_impl(int argc, char** argv)
      */
     auto executor = app.context().get_executor();
     std::promise<void> prom;
-    boost::asio::co_spawn(executor, [executor, ep, params] {
-        return start_query(executor, ep, params);
+    boost::asio::co_spawn(executor, [executor, &ssl_ctx, ep, params] {
+        return start_query(executor, ssl_ctx, ep, params);
     }, [&prom](std::exception_ptr err) {
         prom.set_exception(std::move(err));
     });

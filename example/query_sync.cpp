@@ -6,6 +6,7 @@
 //
 
 //[example_query_sync
+#include <boost/asio/ssl/context.hpp>
 #include <boost/mysql.hpp>
 #include <boost/asio/io_context.hpp>
 #include <boost/system/system_error.hpp>
@@ -60,20 +61,21 @@ void main_impl(int argc, char** argv)
         argv[2],               // password
         "boost_mysql_examples" // database to use; leave empty or omit the parameter for no database
     );
-    // Note: by default, SSL will be used if the server supports it.
-    // connection_params accepts an optional ssl_mode argument
-    // determining whether to use SSL or not.
 
+    // We will use SSL in all our examples. To enable SSL, use boost::mysql::tcp_ssl_connection.
+    // MySQL 8+ default is to use an authentication method that requires SSL, so we encourage
+    // you to use SSL connections if you can.
     boost::asio::io_context ctx;
+    boost::asio::ssl::context ssl_ctx (boost::asio::ssl::context::tls_client);
 
     /**
      * Represents a single connection over TCP to a MySQL server.
      * Before being able to use it, you have to connect to the server by:
      *    - Establishing the TCP-level session.
-     *    - Authenticating to the MySQL server.
+     *    - Authenticating to the MySQL server. The SSL handshake is performed as part of this.
      * connection::connect takes care of both.
      */
-    boost::mysql::tcp_connection conn (ctx);
+    boost::mysql::tcp_ssl_connection conn (ctx, ssl_ctx);
     conn.connect(ep, params);
 
     /**
@@ -88,7 +90,7 @@ void main_impl(int argc, char** argv)
      * We will get all employees working for 'High Growth Startup'.
      */
     const char* sql = "SELECT first_name, last_name, salary FROM employee WHERE company_id = 'HGS'";
-    boost::mysql::tcp_resultset result = conn.query(sql);
+    boost::mysql::tcp_ssl_resultset result = conn.query(sql);
 
     // Get all the rows in the resultset
     std::vector<boost::mysql::row> employees = result.read_all();
