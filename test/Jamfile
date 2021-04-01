@@ -32,6 +32,7 @@ unit-test boost_mysql_unittests
         boost_mysql_test
         unit/detail/auth/auth_calculator.cpp
         unit/detail/auxiliar/static_string.cpp
+        unit/detail/auxiliar/value_type_traits.cpp
         unit/detail/protocol/capabilities.cpp
         unit/detail/protocol/date.cpp
         unit/detail/protocol/null_bitmap_traits.cpp
@@ -43,11 +44,14 @@ unit-test boost_mysql_unittests
         unit/detail/protocol/row_deserialization.cpp
         unit/metadata.cpp
         unit/value.cpp
+        unit/value_constexpr.cpp
         unit/row.cpp
         unit/error.cpp
+        unit/execute_params.cpp
         unit/prepared_statement.cpp
         unit/resultset.cpp
         unit/connection.cpp
+        unit/socket_connection.cpp
         unit/entry_point.cpp
     ;
     
@@ -55,12 +59,12 @@ unit-test boost_mysql_integrationtests
     :
         boost_mysql_test
         /boost/coroutine//boost_coroutine
-        integration/network_functions/network_functions_impl.cpp
-        integration/network_functions/sync.cpp
-        integration/network_functions/async_callback.cpp
-        integration/network_functions/async_coroutine.cpp
-        integration/network_functions/async_coroutinecpp20.cpp
-        integration/network_functions/async_future.cpp
+        integration/network_functions/impl/network_functions.cpp
+        integration/network_functions/impl/tcp.cpp
+        integration/network_functions/impl/tcp_ssl.cpp
+        integration/network_functions/impl/unix.cpp
+        integration/network_functions/impl/unix_ssl.cpp
+        integration/network_functions/impl/tcp_ssl_future.cpp
         integration/metadata_validator.cpp
         integration/connection.cpp
         integration/connect.cpp
@@ -73,6 +77,7 @@ unit-test boost_mysql_integrationtests
         integration/prepared_statement_lifecycle.cpp
         integration/quit_connection.cpp
         integration/close_connection.cpp
+        integration/reconnect.cpp
         integration/database_types.cpp
         integration/entry_point.cpp
     :

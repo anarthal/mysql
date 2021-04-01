@@ -15,6 +15,7 @@ local EXAMPLES =
     query_async_futures
     prepared_statements
     metadata
+    default_completion_tokens
 ;
 
 local EXPLICIT_EXAMPLES = 

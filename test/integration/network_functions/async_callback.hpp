@@ -340,8 +340,8 @@ public:
     }
 };
 
-BOOST_MYSQL_NETFN_EXTERN_TEMPLATE(async_callback_errinfo);
-BOOST_MYSQL_NETFN_EXTERN_TEMPLATE(async_callback_noerrinfo);
+BOOST_MYSQL_NETFN_EXTERN_TEMPLATE(async_callback_errinfo)
+BOOST_MYSQL_NETFN_EXTERN_TEMPLATE(async_callback_noerrinfo)
 
 } // boost
 } // mysql
