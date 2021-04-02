@@ -9,90 +9,35 @@
 #define BOOST_MYSQL_TEST_INTEGRATION_INTEGRATION_TEST_COMMON_HPP
 
 #include <boost/asio/ssl/context.hpp>
-#include <boost/mysql/socket_connection.hpp>
 #include <boost/asio/io_context.hpp>
 #include <boost/test/unit_test.hpp>
 #include <thread>
-#include <type_traits>
 #include "boost/mysql/connection_params.hpp"
 #include "test_common.hpp"
 #include "metadata_validator.hpp"
-#include "network_functions/network_functions.hpp"
-#include "network_functions/all_network_functions.hpp"
-#include "get_endpoint.hpp"
 #include "network_test.hpp"
-#include "stream_list.hpp"
+#include "erased/er_connection.hpp"
+#include "erased/network_variant.hpp"
 
 namespace boost {
 namespace mysql {
 namespace test {
 
-// Verifies that we are or are not using SSL, depending on whether the stream supports it or not
-template <class Stream>
-void validate_ssl(const connection<Stream>& conn, ssl_mode m)
-{
-    bool expected = (m == ssl_mode::require || m == ssl_mode::enable) && supports_ssl<Stream>();
-    BOOST_TEST(conn.uses_ssl() == expected);
-}
-
-// Helper to create a socket_connection<Stream> from a SSL context;
-// also usable for non-SSL streams
-template <class Stream>
-socket_connection<Stream> create_socket_connection_impl(
-    boost::asio::io_context::executor_type executor,
-    boost::asio::ssl::context& ssl_ctx,
-    std::true_type // is ssl stream
-)
-{
-    return socket_connection<Stream>(executor, ssl_ctx);
-}
-
-template <class Stream>
-socket_connection<Stream> create_socket_connection_impl(
-    boost::asio::io_context::executor_type executor,
-    boost::asio::ssl::context&,
-    std::false_type // is ssl stream
-)
-{
-    return socket_connection<Stream>(executor);
-}
-
-template <class Stream>
-socket_connection<Stream> create_socket_connection(
-    boost::asio::io_context::executor_type executor,
-    boost::asio::ssl::context& ssl_ctx
-)
-{
-    return create_socket_connection_impl<Stream>(
-        executor, 
-        ssl_ctx, 
-        std::integral_constant<bool, supports_ssl<Stream>()>()
-    );
-}
 
 
-/**
- * Base fixture to use in integration tests. The fixture constructor creates
- * a connection, an asio io_context and a thread to run it.
- * The fixture is template-parameterized by a stream type, as required
- * by BOOST_MYSQL_NETWORK_TEST.
- */
-template <class Stream>
 struct network_fixture
 {
-    using stream_type = Stream;
-
     connection_params params;
     boost::asio::io_context ctx;
     boost::asio::ssl::context ssl_ctx;
-    socket_connection<Stream> conn;
+    network_variant* var {};
+    er_connection_ptr conn;
     boost::asio::executor_work_guard<boost::asio::io_context::executor_type> guard;
     std::thread runner;
 
     network_fixture() :
         params("integ_user", "integ_password", "boost_mysql_integtests"),
         ssl_ctx(boost::asio::ssl::context::tls_client),
-        conn(create_socket_connection<Stream>(ctx.get_executor(), ssl_ctx)),
         guard(ctx.get_executor()),
         runner([this] { ctx.run(); })
     {
@@ -100,11 +45,18 @@ struct network_fixture
 
     ~network_fixture()
     {
-        error_code code;
-        error_info info;
-        conn.close(code, info);
+        if (conn)
+        {
+            conn->close();
+        }
         guard.reset();
         runner.join();
+    }
+
+    void setup(network_variant* variant)
+    {
+        var = variant;
+        conn = var->create(ctx.get_executor(), ssl_ctx);
     }
 
     void set_credentials(boost::string_view user, boost::string_view password)
@@ -113,28 +65,27 @@ struct network_fixture
         params.set_password(password);
     }
 
-    void physical_connect()
+    // Verifies that we are or are not using SSL, depending on whether the stream supports it or not
+    void validate_ssl(ssl_mode m = ssl_mode::require)
     {
-        conn.next_layer().lowest_layer().connect(get_endpoint<Stream>(endpoint_kind::localhost));
-    }
-
-    // Used by tests that modify the SSL context parameters
-    void recreate_connection()
-    {
-        this->conn = create_socket_connection<Stream>(ctx.get_executor(), ssl_ctx);
+        bool expected = (m == ssl_mode::require || m == ssl_mode::enable) && var->supports_ssl();
+        BOOST_TEST(conn->uses_ssl() == expected);
     }
 
     void handshake(ssl_mode m = ssl_mode::require)
     {
+        assert(conn);
         params.set_ssl(m);
-        conn.handshake(params);
-        validate_ssl(conn, m);
+        conn->handshake(params).validate_no_error();
+        validate_ssl(m);
     }
 
     void connect(ssl_mode m = ssl_mode::require)
     {
-        physical_connect();
-        handshake(m);
+        assert(conn);
+        params.set_ssl(m);
+        conn->connect(endpoint_kind::localhost, params).validate_no_error();
+        validate_ssl(m);
     }
 
     void validate_2fields_meta(
@@ -149,7 +100,7 @@ struct network_fixture
     }
 
     void validate_2fields_meta(
-        const resultset<Stream>& result,
+        const er_resultset& result,
         const std::string& table
     ) const
     {
@@ -161,58 +112,96 @@ struct network_fixture
     // make the testing environment more stable and speed up the tests
     void start_transaction()
     {
-        this->conn.query("START TRANSACTION").read_all();
+        conn->query("START TRANSACTION").get()->read_all().get();
     }
 
     std::int64_t get_table_size(const std::string& table)
     {
-        return this->conn.query("SELECT COUNT(*) FROM " + table)
-                .read_all().at(0).values().at(0).template get<std::int64_t>();
+        return conn->query("SELECT COUNT(*) FROM " + table).get()
+                ->read_all().get().at(0).values().at(0).template get<std::int64_t>();
     }
 };
 
 // To be used as sample in data driven tests, when a test case should be run
 // over all different network_function's.
-template <class Stream>
 struct network_sample
 {
-    network_functions<Stream>* net;
+    network_variant* net;
 
-    network_sample(network_functions<Stream>* funs) :
-        net(funs)
+    network_sample(network_variant* var) :
+        net(var)
     {
     }
 
     void set_test_attributes(boost::unit_test::test_case& test) const
     {
-        test.add_label(net->name());
+        if (net->supports_ssl())
+        {
+            test.add_label("ssl");
+        }
+        test.add_label(net->stream_name());
+        test.add_label(net->variant_name());
     }
 };
 
-template <class Stream>
-std::ostream& operator<<(std::ostream& os, const network_sample<Stream>& value)
+inline std::ostream& operator<<(std::ostream& os, const network_sample& value)
 {
-    return os << value.net->name();
+    return os << value.net->stream_name() << "_" << value.net->variant_name();
 }
 
-// Data generator for network_sample
-struct network_gen
+struct all_variants_gen
 {
-    template <class Stream>
-    static std::vector<network_sample<Stream>> make_all()
+    std::vector<network_sample> make_all()
     {
-        std::vector<network_sample<Stream>> res;
-        for (auto* net: all_network_functions<Stream>())
+        std::vector<network_sample> res;
+        for (auto* net: all_variants())
         {
             res.emplace_back(net);
         }
         return res;
     }
 
-    template <class Stream>
-    static const std::vector<network_sample<Stream>>& generate()
+    const std::vector<network_sample>& operator()()
     {
-        static std::vector<network_sample<Stream>> res = make_all<Stream>();
+        static auto res = make_all();
+        return res;
+    }
+};
+
+struct ssl_only_gen
+{
+    std::vector<network_sample> make_all()
+    {
+        std::vector<network_sample> res;
+        for (auto* net: ssl_variants())
+        {
+            res.emplace_back(net);
+        }
+        return res;
+    }
+
+    const std::vector<network_sample>& operator()()
+    {
+        static auto res = make_all();
+        return res;
+    }
+};
+
+struct non_ssl_only_gen
+{
+    std::vector<network_sample> make_all()
+    {
+        std::vector<network_sample> res;
+        for (auto* net: non_ssl_variants())
+        {
+            res.emplace_back(net);
+        }
+        return res;
+    }
+
+    const std::vector<network_sample>& operator()()
+    {
+        static auto res = make_all();
         return res;
     }
 };
