@@ -122,8 +122,6 @@ public:
 #define BOOST_MYSQL_NETFN_EXTERN_TEMPLATE(cls) \
     extern template class cls<tcp_socket>; \
     extern template class cls<tcp_ssl_socket>; \
-    extern template class cls<tcp_future_socket>; \
-    extern template class cls<tcp_ssl_future_socket>; \
     BOOST_MYSQL_NETFN_EXTERN_TEMPLATE_UNIX(cls)
 
 
