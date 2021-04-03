@@ -43,7 +43,6 @@ BOOST_MYSQL_NETWORK_TEST(invalid_statement, network_fixture)
     setup_and_connect(sample.net);
     auto stmt = conn->prepare_statement("SELECT * FROM bad_table WHERE id IN (?, ?)");
     stmt.validate_error(errc::no_such_table, {"table", "doesn't exist", "bad_table"});
-    BOOST_TEST(!stmt.value->valid());
 }
 
 // Move operations

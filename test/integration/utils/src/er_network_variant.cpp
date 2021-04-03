@@ -18,6 +18,15 @@ static std::vector<er_network_variant*> make_all_variants()
     std::vector<er_network_variant*> res;
     add_sync_errc(res);
     add_sync_exc(res);
+    add_async_callback(res);
+    // add_async_callback_noerrinfo(res);
+    // add_async_future_errinfo(res);
+    // add_async_future_noerrinfo(res);
+    // add_async_coroutine_errinfo(res);
+    // add_async_coroutine_noerrinfo(res);
+    // add_async_coroutinecpp20_errinfo(res);
+    // add_async_coroutinecpp20_noerrinfo(res);
+    // add_default_completion_tokens(res);
     return res;
 }
 

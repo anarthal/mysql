@@ -18,25 +18,6 @@ namespace boost {
 namespace mysql {
 namespace test {
 
-class handler_call_tracker
-{
-    int call_count_ {};
-    std::thread::id calling_thread_ {};
-public:
-    handler_call_tracker() = default;
-    void register_call()
-    {
-        ++call_count_;
-        calling_thread_ = std::this_thread::get_id();
-    }
-    int call_count() const { return call_count_; }
-    std::thread::id calling_thread() const { return calling_thread_; }
-    void verify()
-    {
-        BOOST_TEST(call_count() == 1); // we call handler exactly once
-        BOOST_TEST(calling_thread() != std::this_thread::get_id()); // handler runs in the io_context thread
-    }
-};
 
 template <class Stream>
 class async_callback_errinfo : public network_functions<Stream>

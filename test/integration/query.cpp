@@ -44,7 +44,6 @@ BOOST_MYSQL_NETWORK_TEST(insert_error, network_fixture)
     auto result = conn->query(
         "INSERT INTO bad_table (field_varchar, field_date) VALUES ('v0', '2010-10-11')");
     result.validate_error(errc::no_such_table, {"table", "doesn't exist", "bad_table"});
-    BOOST_TEST(!result.value->valid());
 }
 
 BOOST_MYSQL_NETWORK_TEST(update_ok, network_fixture)
@@ -84,7 +83,6 @@ BOOST_MYSQL_NETWORK_TEST(select_error, network_fixture)
     setup_and_connect(sample.net);
     auto result = conn->query("SELECT field_varchar, field_bad FROM one_row_table");
     result.validate_error(errc::bad_field_error, {"unknown column", "field_bad"});
-    BOOST_TEST(!result.value->valid());
 }
 
 BOOST_AUTO_TEST_SUITE_END() // test_query

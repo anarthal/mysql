@@ -59,7 +59,6 @@ BOOST_MYSQL_NETWORK_TEST(iterator_mismatched_num_params, network_fixture)
     auto result = stmt->execute_params(make_execute_params(params));
     result.validate_error(errc::wrong_num_params,
         {"param", "2", "1", "statement", "execute"});
-    BOOST_TEST(!result.value->valid());
 }
 
 BOOST_MYSQL_NETWORK_TEST(iterator_server_error, network_fixture)
@@ -75,7 +74,6 @@ BOOST_MYSQL_NETWORK_TEST(iterator_server_error, network_fixture)
     auto result = stmt->execute_params(make_execute_params(params));
     result.validate_error(errc::truncated_wrong_value,
         {"field_date", "bad_date", "incorrect date value"});
-    BOOST_TEST(!result.value->valid());
 }
 
 // Container version
@@ -112,7 +110,6 @@ BOOST_MYSQL_NETWORK_TEST(container_mismatched_num_params, network_fixture)
     auto result = stmt->execute_container(make_value_vector("item"));
     result.validate_error(errc::wrong_num_params,
         {"param", "2", "1", "statement", "execute"});
-    BOOST_TEST(!result.value->valid());
 }
 
 BOOST_MYSQL_NETWORK_TEST(container_server_error, network_fixture)
@@ -127,7 +124,6 @@ BOOST_MYSQL_NETWORK_TEST(container_server_error, network_fixture)
     auto result = stmt->execute_container(make_value_vector("f0", "bad_date"));
     result.validate_error(errc::truncated_wrong_value,
         {"field_date", "bad_date", "incorrect date value"});
-    BOOST_TEST(!result.value->valid());
 }
 
 // Other containers. We can't use the type-erased functions here
