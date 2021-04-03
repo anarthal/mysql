@@ -22,6 +22,7 @@
 #include <boost/mysql/resultset.hpp>
 #include <boost/mysql/socket_connection.hpp>
 #include <memory>
+#include <iostream>
 
 using namespace boost::mysql::test;
 using boost::mysql::resultset;
@@ -130,7 +131,8 @@ public:
     sync_errc_connection(socket_connection<Stream>&& conn) : conn_(std::move(conn)) {}
     network_result<no_result> physical_connect(er_endpoint kind) override
     {
-        return impl([&](error_code& code, error_info&) {
+        return impl([&](error_code& code, error_info& info) {
+            info.clear();
             conn_.next_layer().lowest_layer().connect(get_endpoint<Stream>(kind), code);
             return no_result();
         });

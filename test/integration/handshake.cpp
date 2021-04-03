@@ -248,7 +248,8 @@ BOOST_MYSQL_NETWORK_TEST_SSL(certificate_invalid, handshake_fixture)
 {
     ssl_ctx.set_verify_mode(boost::asio::ssl::verify_peer);
     setup_and_physical_connect(sample.net);
-    conn->handshake(params).validate_any_error({ "certificate verify failed" });
+    auto result = conn->handshake(params);
+    BOOST_TEST(result.err.message() == "certificate verify failed");
 }
 
 BOOST_MYSQL_NETWORK_TEST_SSL(custom_certificate_verification_failed, handshake_fixture)
@@ -257,7 +258,8 @@ BOOST_MYSQL_NETWORK_TEST_SSL(custom_certificate_verification_failed, handshake_f
     ssl_ctx.add_certificate_authority(boost::asio::buffer(CA_PEM));
     ssl_ctx.set_verify_callback(boost::asio::ssl::host_name_verification("host.name"));
     setup_and_physical_connect(sample.net);
-    conn->handshake(params).validate_any_error({ "certificate verify failed" });
+    auto result = conn->handshake(params);
+    BOOST_TEST(result.err.message() == "certificate verify failed");
 }
 
 BOOST_MYSQL_NETWORK_TEST_SSL(custom_certificate_verification_ok, handshake_fixture)
