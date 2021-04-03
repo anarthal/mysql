@@ -20,7 +20,7 @@ static std::vector<er_network_variant*> make_all_variants()
     add_sync_exc(res);
     add_async_callback(res);
     add_async_callback_noerrinfo(res);
-    // add_async_future(res);
+    add_async_future(res);
     // add_async_coroutine(res);
     // add_async_coroutinecpp20(res);
     // add_default_completion_tokens(res);

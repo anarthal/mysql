@@ -83,6 +83,7 @@ add_executable(
     integration/utils/src/sync_exc.cpp
     integration/utils/src/async_callback.cpp
     integration/utils/src/async_callback_noerrinfo.cpp
+    integration/utils/src/async_future.cpp
 
     integration/connection.cpp
     integration/connect.cpp
