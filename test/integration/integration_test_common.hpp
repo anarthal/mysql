@@ -13,6 +13,7 @@
 #include <boost/test/unit_test.hpp>
 #include <thread>
 #include "boost/mysql/connection_params.hpp"
+#include "stream_list.hpp"
 #include "test_common.hpp"
 #include "metadata_validator.hpp"
 #include "network_test.hpp"
@@ -23,40 +24,24 @@ namespace boost {
 namespace mysql {
 namespace test {
 
-
-
-struct network_fixture
+struct network_fixture_base
 {
-    connection_params params;
+    connection_params params {"integ_user", "integ_password", "boost_mysql_integtests"};
     boost::asio::io_context ctx;
-    boost::asio::ssl::context ssl_ctx;
+    boost::asio::ssl::context ssl_ctx {boost::asio::ssl::context::tls_client};
     network_variant* var {};
     er_connection_ptr conn;
-    boost::asio::executor_work_guard<boost::asio::io_context::executor_type> guard;
-    std::thread runner;
-
-    network_fixture() :
-        params("integ_user", "integ_password", "boost_mysql_integtests"),
-        ssl_ctx(boost::asio::ssl::context::tls_client),
-        guard(ctx.get_executor()),
-        runner([this] { ctx.run(); })
-    {
-    }
-
-    ~network_fixture()
-    {
-        if (conn)
-        {
-            conn->close();
-        }
-        guard.reset();
-        runner.join();
-    }
 
     void setup(network_variant* variant)
     {
         var = variant;
         conn = var->create(ctx.get_executor(), ssl_ctx);
+    }
+
+    void setup_and_connect(network_variant* variant, ssl_mode m = ssl_mode::require)
+    {
+        setup(variant);
+        connect(m);
     }
 
     void set_credentials(boost::string_view user, boost::string_view password)
@@ -86,6 +71,29 @@ struct network_fixture
         params.set_ssl(m);
         conn->connect(endpoint_kind::localhost, params).validate_no_error();
         validate_ssl(m);
+    }
+};
+
+
+struct network_fixture : network_fixture_base
+{
+    boost::asio::executor_work_guard<boost::asio::io_context::executor_type> guard;
+    std::thread runner;
+
+    network_fixture() :
+        guard(ctx.get_executor()),
+        runner([this] { ctx.run(); })
+    {
+    }
+
+    ~network_fixture()
+    {
+        if (conn)
+        {
+            conn->close();
+        }
+        guard.reset();
+        runner.join();
     }
 
     void validate_2fields_meta(

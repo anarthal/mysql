@@ -136,5 +136,10 @@ struct network_test_registrar
 #define BOOST_MYSQL_NETWORK_TEST(name, fixture) \
     BOOST_MYSQL_NETWORK_TEST_EX(name, fixture, all_variants_gen())
 
+#define BOOST_MYSQL_NETWORK_TEST_SSL(name, fixture) \
+    BOOST_MYSQL_NETWORK_TEST_EX(name, fixture, ssl_only_gen())
+
+#define BOOST_MYSQL_NETWORK_TEST_NOSSL(name, fixture) \
+    BOOST_MYSQL_NETWORK_TEST_EX(name, fixture, non_ssl_only_gen())
 
 #endif

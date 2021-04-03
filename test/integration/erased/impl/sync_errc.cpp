@@ -129,6 +129,13 @@ class sync_errc_connection : public er_connection
     socket_connection<Stream> conn_;
 public:
     sync_errc_connection(socket_connection<Stream>&& conn) : conn_(std::move(conn)) {}
+    network_result<no_result> physical_connect(endpoint_kind kind) override
+    {
+        return impl([&](error_code& code, error_info&) {
+            conn_.next_layer().lowest_layer().connect(get_endpoint<Stream>(kind), code);
+            return no_result();
+        });
+    }
     network_result<no_result> connect(
         endpoint_kind kind,
         const boost::mysql::connection_params& params

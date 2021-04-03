@@ -16,10 +16,7 @@ BOOST_AUTO_TEST_SUITE(test_close_connection)
 
 BOOST_MYSQL_NETWORK_TEST(active_connection, network_fixture)
 {
-    setup(sample.net);
-
-    // Connect
-    connect();
+    setup_and_connect(sample.net);
 
     // Close
     conn->close().validate_no_error();
@@ -33,10 +30,7 @@ BOOST_MYSQL_NETWORK_TEST(active_connection, network_fixture)
 
 BOOST_MYSQL_NETWORK_TEST(double_close, network_fixture)
 {
-    setup(sample.net);
-
-    // Connect
-    connect();
+    setup_and_connect(sample.net);
 
     // Close
     conn->close().validate_no_error();

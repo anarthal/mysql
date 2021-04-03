@@ -5,9 +5,11 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
+#include "boost/mysql/tcp.hpp"
 #include "integration_test_common.hpp"
 #include "metadata_validator.hpp"
 #include "test_common.hpp"
+#include <boost/asio/io_context.hpp>
 #include <boost/test/data/monomorphic/collection.hpp>
 #include <boost/test/data/test_case.hpp>
 #include <cstdint>
@@ -56,11 +58,11 @@ std::ostream& operator<<(std::ostream& os, const database_types_sample& input)
 }
 
 // Fixture
-struct database_types_fixture : network_fixture<boost::asio::ip::tcp::socket>
+struct database_types_fixture : network_fixture_base
 {
     database_types_fixture()
     {
-        this->connect();
+        setup_and_connect(tcp_sync_errc_variant());
     }
 };
 

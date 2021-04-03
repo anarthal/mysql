@@ -30,6 +30,7 @@ public:
 const std::vector<network_variant*>& all_variants();
 const std::vector<network_variant*>& ssl_variants();
 const std::vector<network_variant*>& non_ssl_variants();
+network_variant* tcp_sync_errc_variant();
 
 void add_sync_errc(std::vector<network_variant*>&);
 

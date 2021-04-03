@@ -27,6 +27,7 @@ public:
     virtual bool valid() const = 0;
     virtual bool uses_ssl() const = 0;
     virtual bool is_open() const = 0;
+    virtual network_result<no_result> physical_connect(endpoint_kind) = 0;
     virtual network_result<no_result> connect(endpoint_kind, const connection_params&) = 0;
     virtual network_result<no_result> handshake(const connection_params&) = 0;
     virtual network_result<er_resultset_ptr> query(boost::string_view query) = 0;

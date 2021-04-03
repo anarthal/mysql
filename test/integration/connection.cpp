@@ -6,6 +6,7 @@
 //
 
 #include <boost/mysql/connection.hpp>
+#include <boost/mysql/socket_connection.hpp>
 #include "integration_test_common.hpp"
 #include "get_endpoint.hpp"
 
@@ -16,7 +17,7 @@ using boost::asio::ip::tcp;
 
 BOOST_AUTO_TEST_SUITE(test_connection)
 
-BOOST_FIXTURE_TEST_CASE(move_constructor_connected_connection, network_fixture<tcp::socket>)
+BOOST_FIXTURE_TEST_CASE(move_constructor_connected_connection, network_fixture)
 {
     // First connection
     connection<tcp::socket> first (ctx);
@@ -33,7 +34,7 @@ BOOST_FIXTURE_TEST_CASE(move_constructor_connected_connection, network_fixture<t
     second.query("SELECT 1"); // doesn't throw
 }
 
-BOOST_FIXTURE_TEST_CASE(move_assignment_from_connected_connection, network_fixture<tcp::socket>)
+BOOST_FIXTURE_TEST_CASE(move_assignment_from_connected_connection, network_fixture)
 {
     // First connection
     connection<tcp::socket> first (ctx);
@@ -56,7 +57,7 @@ BOOST_AUTO_TEST_SUITE_END() // test_connection
 
 BOOST_AUTO_TEST_SUITE(test_socket_connection)
 
-BOOST_FIXTURE_TEST_CASE(move_constructor_connected_connection, network_fixture<tcp::socket>)
+BOOST_FIXTURE_TEST_CASE(move_constructor_connected_connection, network_fixture)
 {
     // First connection
     socket_connection<tcp::socket> first (ctx);
@@ -72,7 +73,7 @@ BOOST_FIXTURE_TEST_CASE(move_constructor_connected_connection, network_fixture<t
     second.query("SELECT 1"); // doesn't throw
 }
 
-BOOST_FIXTURE_TEST_CASE(move_assignment_from_connected_connection, network_fixture<tcp::socket>)
+BOOST_FIXTURE_TEST_CASE(move_assignment_from_connected_connection, network_fixture)
 {
     // First connection
     socket_connection<tcp::socket> first (ctx);
