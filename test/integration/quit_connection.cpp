@@ -12,17 +12,15 @@ using boost::mysql::error_code;
 
 BOOST_AUTO_TEST_SUITE(test_quit_connection)
 
-BOOST_MYSQL_NETWORK_TEST(active_connection, network_fixture, network_gen)
+BOOST_MYSQL_NETWORK_TEST(active_connection, network_fixture)
 {
-    this->connect();
+    setup_and_connect(sample.net);
 
     // Quit
-    auto result = sample.net->quit(this->conn);
-    result.validate_no_error();
+    conn->quit().validate_no_error();
 
     // We are no longer able to query
-    auto query_result = sample.net->query(this->conn, "SELECT 1");
-    query_result.validate_any_error();
+    conn->query("SELECT 1").validate_any_error();
 }
 
 BOOST_AUTO_TEST_SUITE_END() // test_quit_connection

@@ -13,12 +13,11 @@
 #include <boost/test/unit_test.hpp>
 #include <thread>
 #include "boost/mysql/connection_params.hpp"
-#include "stream_list.hpp"
 #include "test_common.hpp"
 #include "metadata_validator.hpp"
 #include "network_test.hpp"
-#include "erased/er_connection.hpp"
-#include "erased/network_variant.hpp"
+#include "er_connection.hpp"
+#include "er_network_variant.hpp"
 
 namespace boost {
 namespace mysql {
@@ -29,8 +28,30 @@ struct network_fixture_base
     connection_params params {"integ_user", "integ_password", "boost_mysql_integtests"};
     boost::asio::io_context ctx;
     boost::asio::ssl::context ssl_ctx {boost::asio::ssl::context::tls_client};
+};
+
+struct network_fixture : network_fixture_base
+{
     network_variant* var {};
     er_connection_ptr conn;
+    boost::asio::executor_work_guard<boost::asio::io_context::executor_type> guard;
+    std::thread runner;
+
+    network_fixture() :
+        guard(ctx.get_executor()),
+        runner([this] { ctx.run(); })
+    {
+    }
+
+    ~network_fixture()
+    {
+        if (conn)
+        {
+            conn->close();
+        }
+        guard.reset();
+        runner.join();
+    }
 
     void setup(network_variant* variant)
     {
@@ -69,31 +90,8 @@ struct network_fixture_base
     {
         assert(conn);
         params.set_ssl(m);
-        conn->connect(endpoint_kind::localhost, params).validate_no_error();
+        conn->connect(er_endpoint::localhost, params).validate_no_error();
         validate_ssl(m);
-    }
-};
-
-
-struct network_fixture : network_fixture_base
-{
-    boost::asio::executor_work_guard<boost::asio::io_context::executor_type> guard;
-    std::thread runner;
-
-    network_fixture() :
-        guard(ctx.get_executor()),
-        runner([this] { ctx.run(); })
-    {
-    }
-
-    ~network_fixture()
-    {
-        if (conn)
-        {
-            conn->close();
-        }
-        guard.reset();
-        runner.join();
     }
 
     void validate_2fields_meta(
@@ -159,7 +157,7 @@ inline std::ostream& operator<<(std::ostream& os, const network_sample& value)
 
 struct all_variants_gen
 {
-    std::vector<network_sample> make_all()
+    std::vector<network_sample> make_all() const
     {
         std::vector<network_sample> res;
         for (auto* net: all_variants())
@@ -169,7 +167,7 @@ struct all_variants_gen
         return res;
     }
 
-    const std::vector<network_sample>& operator()()
+    const std::vector<network_sample>& operator()() const
     {
         static auto res = make_all();
         return res;
@@ -178,7 +176,7 @@ struct all_variants_gen
 
 struct ssl_only_gen
 {
-    std::vector<network_sample> make_all()
+    std::vector<network_sample> make_all() const
     {
         std::vector<network_sample> res;
         for (auto* net: ssl_variants())
@@ -188,7 +186,7 @@ struct ssl_only_gen
         return res;
     }
 
-    const std::vector<network_sample>& operator()()
+    const std::vector<network_sample>& operator()() const
     {
         static auto res = make_all();
         return res;
@@ -197,7 +195,7 @@ struct ssl_only_gen
 
 struct non_ssl_only_gen
 {
-    std::vector<network_sample> make_all()
+    std::vector<network_sample> make_all() const
     {
         std::vector<network_sample> res;
         for (auto* net: non_ssl_variants())
@@ -207,7 +205,7 @@ struct non_ssl_only_gen
         return res;
     }
 
-    const std::vector<network_sample>& operator()()
+    const std::vector<network_sample>& operator()() const
     {
         static auto res = make_all();
         return res;

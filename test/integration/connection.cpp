@@ -24,7 +24,7 @@ BOOST_FIXTURE_TEST_CASE(move_constructor_connected_connection, network_fixture)
     BOOST_TEST(first.valid());
 
     // Connect
-    first.next_layer().connect(get_endpoint<tcp::socket>(endpoint_kind::localhost));
+    first.next_layer().connect(get_endpoint<tcp::socket>(er_endpoint::localhost));
     first.handshake(params);
 
     // Construct second connection
@@ -43,7 +43,7 @@ BOOST_FIXTURE_TEST_CASE(move_assignment_from_connected_connection, network_fixtu
     BOOST_TEST(second.valid());
 
     // Connect
-    first.next_layer().connect(get_endpoint<tcp::socket>(endpoint_kind::localhost));
+    first.next_layer().connect(get_endpoint<tcp::socket>(er_endpoint::localhost));
     first.handshake(params);
 
     // Move
@@ -64,7 +64,7 @@ BOOST_FIXTURE_TEST_CASE(move_constructor_connected_connection, network_fixture)
     BOOST_TEST(first.valid());
 
     // Connect
-    first.connect(get_endpoint<tcp::socket>(endpoint_kind::localhost), params);
+    first.connect(get_endpoint<tcp::socket>(er_endpoint::localhost), params);
 
     // Construct second connection
     socket_connection<tcp::socket> second (std::move(first));
@@ -82,7 +82,7 @@ BOOST_FIXTURE_TEST_CASE(move_assignment_from_connected_connection, network_fixtu
     BOOST_TEST(second.valid());
 
     // Connect
-    first.connect(get_endpoint<tcp::socket>(endpoint_kind::localhost), params);
+    first.connect(get_endpoint<tcp::socket>(er_endpoint::localhost), params);
 
     // Move
     second = std::move(first);

@@ -42,4 +42,4 @@ using er_statement_ptr = std::unique_ptr<er_statement>;
 } // boost
 
 
-#endif /* TEST_INTEGRATION_NETWORK_FUNCTIONS_HPP_ */
+#endif

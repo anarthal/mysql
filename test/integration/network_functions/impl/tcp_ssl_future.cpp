@@ -5,7 +5,7 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#include "../async_future.hpp"
+#include "async_future.hpp"
 
 using namespace boost::mysql::test;
 using boost::mysql::row;

@@ -5,8 +5,7 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#include "../network_functions.hpp"
-#include <boost/asio/use_awaitable.hpp> // for BOOST_ASIO_HAS_CO_AWAIT
+#include "network_result.hpp"
 #include <boost/test/unit_test.hpp>
 #include "test_common.hpp"
 
@@ -56,4 +55,3 @@ void network_result_base::validate_error(
         validate_string_contains(info->message(), expected_msg);
     }
 }
-

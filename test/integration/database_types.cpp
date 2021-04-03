@@ -6,7 +6,7 @@
 //
 
 #include "boost/mysql/tcp.hpp"
-#include "integration_test_common.hpp"
+#include "tcp_network_fixture.hpp"
 #include "metadata_validator.hpp"
 #include "test_common.hpp"
 #include <boost/asio/io_context.hpp>
@@ -56,15 +56,6 @@ std::ostream& operator<<(std::ostream& os, const database_types_sample& input)
 {
     return os << input.table << '.' << input.field << '.' << input.row_id;
 }
-
-// Fixture
-struct database_types_fixture : network_fixture_base
-{
-    database_types_fixture()
-    {
-        setup_and_connect(tcp_sync_errc_variant());
-    }
-};
 
 // Helpers
 using flagsvec = std::vector<meta_validator::flag_getter>;
@@ -609,8 +600,10 @@ std::vector<database_types_sample> make_all_samples()
 
 std::vector<database_types_sample> all_samples = make_all_samples();
 
-BOOST_DATA_TEST_CASE_F(database_types_fixture, query, data::make(all_samples))
+BOOST_DATA_TEST_CASE_F(tcp_network_fixture, query, data::make(all_samples))
 {
+    connect();
+
     // Compose the query
     auto query = stringize(
         "SELECT ", sample.field,
@@ -631,8 +624,10 @@ BOOST_DATA_TEST_CASE_F(database_types_fixture, query, data::make(all_samples))
     BOOST_TEST(rows[0].values()[0] == sample.expected_value);
 }
 
-BOOST_DATA_TEST_CASE_F(database_types_fixture, prepared_statement, data::make(all_samples))
+BOOST_DATA_TEST_CASE_F(tcp_network_fixture, prepared_statement, data::make(all_samples))
 {
+    connect();
+
     // Prepare the statement
     auto stmt_sql = stringize(
         "SELECT ", sample.field,
@@ -674,10 +669,12 @@ make_prepared_stmt_param_samples()
     return res;
 }
 
-BOOST_DATA_TEST_CASE_F(database_types_fixture,
+BOOST_DATA_TEST_CASE_F(tcp_network_fixture,
     prepared_statement_execute_param,
     data::make(make_prepared_stmt_param_samples()))
 {
+    connect();
+    
     // Prepare the statement
     auto stmt_sql = stringize(
         "SELECT ", sample.field,
@@ -697,8 +694,9 @@ BOOST_DATA_TEST_CASE_F(database_types_fixture,
 }
 
 // Validate that the metadata we retrieve with certain queries is correct
-BOOST_FIXTURE_TEST_CASE(aliased_table_metadata, database_types_fixture)
+BOOST_FIXTURE_TEST_CASE(aliased_table_metadata, tcp_network_fixture)
 {
+    connect();
     auto result = conn.query(
         "SELECT field_varchar AS field_alias FROM empty_table table_alias");
     std::vector<meta_validator> validators {

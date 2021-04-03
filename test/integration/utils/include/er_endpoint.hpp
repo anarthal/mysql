@@ -5,12 +5,21 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#include "../all_network_functions.hpp"
+#ifndef BOOST_MYSQL_TEST_INTEGRATION_GET_ENDPOINT25_HPP
+#define BOOST_MYSQL_TEST_INTEGRATION_GET_ENDPOINT25_HPP
 
-#ifdef BOOST_ASIO_HAS_LOCAL_SOCKETS
+namespace boost {
+namespace mysql {
+namespace test {
 
-using namespace boost::mysql::test;
+enum class er_endpoint
+{
+    localhost,
+    inexistent
+};
 
-BOOST_MYSQL_NETFNS_INSTANTIATE(unix_socket)
+}
+}
+}
 
 #endif

@@ -8,10 +8,10 @@
 #include <boost/mysql/connection_params.hpp>
 #include <boost/mysql/tcp_ssl.hpp>
 #include "boost/mysql/errc.hpp"
-#include "erased/network_variant.hpp"
+#include "er_network_variant.hpp"
 #include "get_endpoint.hpp"
 #include "integration_test_common.hpp"
-#include "stream_list.hpp"
+#include "streams.hpp"
 #include "test_common.hpp"
 #include <boost/asio/ssl/verify_mode.hpp>
 #include <boost/asio/ssl/host_name_verification.hpp>
@@ -36,7 +36,7 @@ struct handshake_fixture : network_fixture
     void setup_and_physical_connect(network_variant* net)
     {
         setup(net);
-        conn->physical_connect(endpoint_kind::localhost).validate_no_error();
+        conn->physical_connect(er_endpoint::localhost).validate_no_error();
     }
 
     void do_handshake_ok()
@@ -97,7 +97,7 @@ struct caching_sha2_fixture : handshake_fixture
     {
         tcp_ssl_connection conn (ctx, ssl_ctx);
         conn.connect(
-            get_endpoint<tcp_socket>(endpoint_kind::localhost),
+            get_endpoint<tcp_socket>(er_endpoint::localhost),
             connection_params(user, password)
         );
         conn.close();
@@ -107,7 +107,7 @@ struct caching_sha2_fixture : handshake_fixture
     {
         tcp_ssl_connection conn (ctx, ssl_ctx);
         conn.connect(
-            get_endpoint<tcp_socket>(endpoint_kind::localhost),
+            get_endpoint<tcp_socket>(er_endpoint::localhost),
             connection_params("root", "")
         );
         conn.query("FLUSH PRIVILEGES");
@@ -248,8 +248,7 @@ BOOST_MYSQL_NETWORK_TEST_SSL(certificate_invalid, handshake_fixture)
 {
     ssl_ctx.set_verify_mode(boost::asio::ssl::verify_peer);
     setup_and_physical_connect(sample.net);
-    auto result = conn->handshake(params);
-    BOOST_TEST(result.err.message() == "certificate verify failed");
+    conn->handshake(params).validate_any_error({ "certificate verify failed" });
 }
 
 BOOST_MYSQL_NETWORK_TEST_SSL(custom_certificate_verification_failed, handshake_fixture)
@@ -258,8 +257,7 @@ BOOST_MYSQL_NETWORK_TEST_SSL(custom_certificate_verification_failed, handshake_f
     ssl_ctx.add_certificate_authority(boost::asio::buffer(CA_PEM));
     ssl_ctx.set_verify_callback(boost::asio::ssl::host_name_verification("host.name"));
     setup_and_physical_connect(sample.net);
-    auto result = conn->handshake(params);
-    BOOST_TEST(result.err.message() == "certificate verify failed");
+    conn->handshake(params).validate_any_error({ "certificate verify failed" });
 }
 
 BOOST_MYSQL_NETWORK_TEST_SSL(custom_certificate_verification_ok, handshake_fixture)

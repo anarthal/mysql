@@ -6,11 +6,10 @@
 //
 
 #include <boost/mysql/execute_params.hpp>
-#include <boost/mysql/tcp.hpp>
-#include "erased/network_variant.hpp"
-#include "get_endpoint.hpp"
+#include "er_network_variant.hpp"
 #include "integration_test_common.hpp"
-#include "stream_list.hpp"
+#include "tcp_network_fixture.hpp"
+#include "streams.hpp"
 #include <forward_list>
 
 using namespace boost::mysql::test;
@@ -132,28 +131,18 @@ BOOST_MYSQL_NETWORK_TEST(container_server_error, network_fixture)
 }
 
 // Other containers. We can't use the type-erased functions here
-BOOST_FIXTURE_TEST_CASE(no_statement_params_variable, network_fixture_base)
+BOOST_FIXTURE_TEST_CASE(no_statement_params_variable, tcp_network_fixture)
 {
-    // Connect
-    boost::mysql::tcp_connection conn (ctx.get_executor());
-    conn.connect(get_endpoint<tcp_socket>(endpoint_kind::localhost), params);
-
-    // Prepare
+    connect();
     auto stmt = conn.prepare_statement("SELECT * FROM empty_table");
     auto result = stmt.execute(boost::mysql::no_statement_params);
     BOOST_TEST(result.valid());
 }
 
-BOOST_FIXTURE_TEST_CASE(c_array, network_fixture_base)
+BOOST_FIXTURE_TEST_CASE(c_array, tcp_network_fixture)
 {
-    // Connect
-    boost::mysql::tcp_connection conn (ctx.get_executor());
-    conn.connect(get_endpoint<tcp_socket>(endpoint_kind::localhost), params);
-
-    // Prepare
+    connect();
     auto stmt = conn.prepare_statement("SELECT * FROM empty_table WHERE id IN (?, ?)");
-
-    // Execute
     value arr [] = { value("hola"), value(10) };
     auto result = stmt.execute(arr);
     BOOST_TEST(result.valid());

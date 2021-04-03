@@ -14,7 +14,7 @@
 #include "async_coroutine.hpp"
 #include "async_coroutinecpp20.hpp"
 #include "async_future.hpp"
-#include "../stream_list.hpp"
+#include "stream_list.hpp"
 
 namespace boost {
 namespace mysql {

@@ -5,7 +5,8 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#include "../network_variant.hpp"
+#include "er_network_variant.hpp"
+#include "er_impl_common.hpp"
 #include <algorithm>
 #include <functional>
 #include <iterator>

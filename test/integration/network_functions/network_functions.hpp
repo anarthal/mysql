@@ -11,7 +11,7 @@
 #include <boost/mysql/socket_connection.hpp>
 #include <forward_list>
 #include <boost/optional/optional.hpp>
-#include "../stream_list.hpp"
+#include "stream_list.hpp"
 
 /**
  * A mechanism to test all variants of a network algorithm (e.g. synchronous

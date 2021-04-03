@@ -6,7 +6,6 @@
 //
 
 #include "integration_test_common.hpp"
-#include "get_endpoint.hpp"
 
 using namespace boost::mysql::test;
 using boost::mysql::errc;
@@ -23,7 +22,7 @@ BOOST_MYSQL_NETWORK_TEST(physical_error, network_fixture)
 
     // Connect to a bad endpoint
     // depending on system and stream type, error code will be different
-    conn->connect(endpoint_kind::inexistent, params).validate_any_error({"physical connect failed"});
+    conn->connect(er_endpoint::inexistent, params).validate_any_error({"physical connect failed"});
     BOOST_TEST(!conn->is_open());
 }
 
@@ -31,7 +30,7 @@ BOOST_MYSQL_NETWORK_TEST(physical_ok_handshake_error, network_fixture)
 {
     setup(sample.net);
     set_credentials("integ_user", "bad_password");
-    conn->connect(endpoint_kind::localhost, params).validate_error(
+    conn->connect(er_endpoint::localhost, params).validate_error(
         errc::access_denied_error, {"access denied", "integ_user"});
     BOOST_TEST(!conn->is_open());
 }

@@ -8,8 +8,8 @@
 #ifndef BOOST_MYSQL_TEST_INTEGRATION_NETWORK_FUNCTIONS_NETWORK_FUNCTIONS_IMPL_HPP
 #define BOOST_MYSQL_TEST_INTEGRATION_NETWORK_FUNCTIONS_NETWORK_FUNCTIONS_IMPL_HPP
 
-#include "../network_functions.hpp"
-#include "../stream_list.hpp"
+#include "network_functions.hpp"
+#include "stream_list.hpp"
 
 namespace boost {
 namespace mysql {

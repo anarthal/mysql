@@ -75,13 +75,12 @@ endif()
 # Integration testing
 add_executable(
     boost_mysql_integrationtests
-    integration/network_functions/impl/network_functions.cpp
-    integration/network_functions/impl/tcp.cpp
-    integration/network_functions/impl/tcp_ssl.cpp
-    integration/network_functions/impl/unix.cpp
-    integration/network_functions/impl/unix_ssl.cpp
-    integration/network_functions/impl/tcp_ssl_future.cpp
-    integration/metadata_validator.cpp
+
+    integration/utils/src/metadata_validator.cpp
+    integration/utils/src/network_result.cpp
+    integration/utils/src/er_network_variant.cpp
+    integration/utils/src/sync_errc.cpp
+
     integration/connection.cpp
     integration/connect.cpp
     integration/handshake.cpp
@@ -96,6 +95,11 @@ add_executable(
     integration/reconnect.cpp
     integration/database_types.cpp
     integration/entry_point.cpp
+)
+target_include_directories(
+    boost_mysql_integrationtests
+    PRIVATE
+    integration/utils/include
 )
 target_link_libraries(
     boost_mysql_integrationtests

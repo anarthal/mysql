@@ -8,7 +8,7 @@
 #ifndef BOOST_MYSQL_TEST_INTEGRATION_plch19g_HPP
 #define BOOST_MYSQL_TEST_INTEGRATION_plch19g_HPP
 
-#include "../network_variant.hpp"
+#include "er_network_variant.hpp"
 #include <boost/mysql/socket_connection.hpp>
 #include <boost/asio/ssl/context.hpp>
 #include <boost/asio/io_context.hpp>
@@ -17,6 +17,9 @@
 namespace boost {
 namespace mysql {
 namespace test {
+
+
+void add_sync_errc(std::vector<network_variant*>&);
 
 class tcp_variant : public network_variant
 {

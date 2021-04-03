@@ -117,6 +117,7 @@ public:
     // Getting the underlying stream
     using stream_type = Stream;
     stream_type& next_layer() noexcept { return stream_; }
+    const stream_type& next_layer() const noexcept { return stream_; }
 
     using lowest_layer_type = typename stream_type::lowest_layer_type;
     lowest_layer_type& lowest_layer() noexcept { return stream_.lowest_layer(); }

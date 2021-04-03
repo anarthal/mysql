@@ -5,14 +5,14 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#include "../network_variant.hpp"
-#include "../er_connection.hpp"
-#include "../er_resultset.hpp"
-#include "../er_statement.hpp"
-#include "../network_result.hpp"
-#include "../../stream_list.hpp"
-#include "boost/mysql/tcp.hpp"
-#include "common.hpp"
+#include "er_network_variant.hpp"
+#include "er_connection.hpp"
+#include "er_resultset.hpp"
+#include "er_statement.hpp"
+#include "network_result.hpp"
+#include "streams.hpp"
+#include "er_impl_common.hpp"
+#include "get_endpoint.hpp"
 #include "boost/mysql/connection_params.hpp"
 #include "boost/mysql/errc.hpp"
 #include "boost/mysql/error.hpp"
@@ -30,12 +30,10 @@ using boost::mysql::errc;
 using boost::mysql::error_code;
 using boost::mysql::error_info;
 using boost::mysql::field_metadata;
-using boost::mysql::execute_params;
 using boost::mysql::prepared_statement;
 using boost::mysql::value;
 using boost::mysql::socket_connection;
 using boost::mysql::connection_params;
-using boost::mysql::tcp_connection;
 
 namespace {
 
@@ -94,8 +92,9 @@ class sync_errc_statement : public er_statement
 {
     prepared_statement<Stream> stmt_;
 public:
+    sync_errc_statement(prepared_statement<Stream>&& stmt): stmt_(std::move(stmt)) {}
     network_result<er_resultset_ptr> execute_params(
-        const execute_params<value_list_it>& params
+        const boost::mysql::execute_params<value_list_it>& params
     ) override
     {
         return impl([&](error_code& err, error_info& info) {
@@ -129,7 +128,7 @@ class sync_errc_connection : public er_connection
     socket_connection<Stream> conn_;
 public:
     sync_errc_connection(socket_connection<Stream>&& conn) : conn_(std::move(conn)) {}
-    network_result<no_result> physical_connect(endpoint_kind kind) override
+    network_result<no_result> physical_connect(er_endpoint kind) override
     {
         return impl([&](error_code& code, error_info&) {
             conn_.next_layer().lowest_layer().connect(get_endpoint<Stream>(kind), code);
@@ -137,7 +136,7 @@ public:
         });
     }
     network_result<no_result> connect(
-        endpoint_kind kind,
+        er_endpoint kind,
         const boost::mysql::connection_params& params
     ) override
     {

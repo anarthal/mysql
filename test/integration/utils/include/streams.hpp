@@ -11,49 +11,41 @@
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/asio/local/stream_protocol.hpp>
 #include <boost/asio/ssl/stream.hpp>
-#include <boost/mp11/list.hpp>
-#include "tcp_future_socket.hpp"
-
+#include <boost/asio/use_future.hpp>
 
 namespace boost {
 namespace mysql {
 namespace test {
 
-// Make stream names shorter
+// A TCP socket that has use_future as default completion token
+class future_executor : public boost::asio::io_context::executor_type
+{
+public:
+    future_executor(const boost::asio::io_context::executor_type& inner) :
+        boost::asio::io_context::executor_type(inner) {}
+    using default_completion_token_type = boost::asio::use_future_t<>;
+    
+    // Required to build in MSVC for some arcane reason
+    operator boost::asio::any_io_executor() const
+    {
+        return boost::asio::any_io_executor(static_cast<const boost::asio::io_context::executor_type>(*this));
+    }
+};
+
+// The actual streams we will be using to test
 using tcp_socket = boost::asio::ip::tcp::socket;
 using tcp_ssl_socket = boost::asio::ssl::stream<tcp_socket>;
-using tcp_ssl_future_socket = boost::asio::ssl::stream<tcp_future_socket>;
+using tcp_ssl_future_socket = boost::asio::ssl::stream<
+    boost::asio::basic_stream_socket<
+        boost::asio::ip::tcp,
+        future_executor
+    >
+>;
 
 #ifdef BOOST_ASIO_HAS_LOCAL_SOCKETS
 using unix_socket = boost::asio::local::stream_protocol::socket;
 using unix_ssl_socket = boost::asio::ssl::stream<unix_socket>;
 #endif
-
-// Stream lists
-using all_non_ssl_streams = boost::mp11::mp_list<
-#ifdef BOOST_ASIO_HAS_LOCAL_SOCKETS
-    unix_socket,
-#endif
-    tcp_socket
->;
-
-using all_ssl_streams = boost::mp11::mp_list<
-#ifdef BOOST_ASIO_HAS_LOCAL_SOCKETS
-    unix_ssl_socket,
-#endif
-    tcp_ssl_socket,
-    tcp_ssl_future_socket
->;
-
-using all_streams = boost::mp11::mp_list<
-#ifdef BOOST_ASIO_HAS_LOCAL_SOCKETS
-    unix_socket,
-    unix_ssl_socket,
-#endif
-    tcp_socket,
-    tcp_ssl_socket,
-    tcp_ssl_future_socket
->;
 
 // Stream names
 template <class Stream> constexpr const char* get_stream_name();
