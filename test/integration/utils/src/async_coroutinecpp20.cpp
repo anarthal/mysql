@@ -232,13 +232,18 @@ async_coroutinecpp20_variant<tcp_ssl_socket> tcp_ssl;
 
 #endif
 
+#if BOOST_ASIO_HAS_CO_AWAIT
 void boost::mysql::test::add_async_coroutinecpp20(
     std::vector<er_network_variant*>& output
 )
 {
-#ifdef BOOST_ASIO_HAS_CO_AWAIT
     output.push_back(&tcp);
     output.push_back(&tcp_ssl);
-#endif
 }
-
+#else
+void boost::mysql::test::add_async_coroutinecpp20(
+    std::vector<er_network_variant*>&
+)
+{
+}
+#endif
