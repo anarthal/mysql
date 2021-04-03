@@ -53,8 +53,6 @@ unit-test boost_mysql_unittests
         unit/connection.cpp
         unit/socket_connection.cpp
         unit/entry_point.cpp
-    :
-        <include>integration/utils/include
     ;
     
 unit-test boost_mysql_integrationtests 
@@ -88,4 +86,5 @@ unit-test boost_mysql_integrationtests
         integration/entry_point.cpp
     :
         <testing.arg>$(TEST_COMMAND)
+        <include>integration/utils/include
     ;
