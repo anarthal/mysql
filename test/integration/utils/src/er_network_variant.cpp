@@ -17,6 +17,7 @@ static std::vector<er_network_variant*> make_all_variants()
 {
     std::vector<er_network_variant*> res;
     add_sync_errc(res);
+    add_sync_exc(res);
     return res;
 }
 

@@ -80,6 +80,7 @@ add_executable(
     integration/utils/src/network_result.cpp
     integration/utils/src/er_network_variant.cpp
     integration/utils/src/sync_errc.cpp
+    integration/utils/src/sync_exc.cpp
 
     integration/connection.cpp
     integration/connect.cpp

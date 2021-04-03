@@ -25,7 +25,6 @@
 
 using namespace boost::mysql::test;
 using boost::mysql::row;
-using boost::mysql::errc;
 using boost::mysql::error_code;
 using boost::mysql::error_info;
 using boost::mysql::value;
@@ -34,49 +33,51 @@ using boost::mysql::connection_params;
 namespace {
 
 template <class Callable>
-using impl_result_type = decltype(std::declval<Callable>()(
-    std::declval<error_code&>(),
-    std::declval<error_info&>()
-));
+using impl_result_type = decltype(std::declval<Callable>()());
 
 template <class Callable>
 static network_result<impl_result_type<Callable>> impl(Callable&& cb)
 {
-    network_result<impl_result_type<Callable>> res (
-        boost::mysql::make_error_code(errc::no),
-        error_info("error_info not cleared properly")
-    );
-    res.value = cb(res.err, *res.info);
+    network_result<impl_result_type<Callable>> res;
+    try
+    {
+        res.value = cb();
+    }
+    catch (const boost::system::system_error& err)
+    {
+        res.err = err.code();
+        res.info = error_info(err.what());
+    }
     return res;
 }
 
 template <class Stream>
-class sync_errc_resultset : public er_resultset_base<Stream>
+class sync_exc_resultset : public er_resultset_base<Stream>
 {
 public:
     using er_resultset_base<Stream>::er_resultset_base;
     network_result<bool> read_one(row& output) override
     {
-        return impl([&](error_code& code, error_info& info) {
-            return this->r_.read_one(output, code, info);
+        return impl([&] {
+            return this->r_.read_one(output);
         });
     }
     network_result<std::vector<row>> read_many(std::size_t count) override
     {
-        return impl([&](error_code& code, error_info& info) {
-            return this->r_.read_many(count, code, info);
+        return impl([&] {
+            return this->r_.read_many(count);
         });
     }
     network_result<std::vector<row>> read_all() override
     {
-        return impl([&](error_code& code, error_info& info) {
-            return this->r_.read_all(code, info);
+        return impl([&] {
+            return this->r_.read_all();
         });
     }
 };
 
 template <class Stream>
-class sync_errc_statement : public er_statement_base<Stream>
+class sync_exc_statement : public er_statement_base<Stream>
 {
 public:
     using er_statement_base<Stream>::er_statement_base;
@@ -84,37 +85,36 @@ public:
         const boost::mysql::execute_params<value_list_it>& params
     ) override
     {
-        return impl([&](error_code& err, error_info& info) {
-            return erase_resultset<sync_errc_resultset>(this->stmt_.execute(params, err, info));
+        return impl([&]{
+            return erase_resultset<sync_exc_resultset>(this->stmt_.execute(params));
         });
     }
     network_result<er_resultset_ptr> execute_container(
         const std::vector<value>& values
     ) override
     {
-        return impl([&](error_code& err, error_info& info) {
-            return erase_resultset<sync_errc_resultset>(this->stmt_.execute(values, err, info));
+        return impl([&] {
+            return erase_resultset<sync_exc_resultset>(this->stmt_.execute(values));
         });
     }
     network_result<no_result> close() override
     {
-        return impl([&](error_code& code, error_info& info) {
-            this->stmt_.close(code, info);
+        return impl([&] {
+            this->stmt_.close();
             return no_result();
         });
     }
 };
 
 template <class Stream>
-class sync_errc_connection : public er_connection_base<Stream>
+class sync_exc_connection : public er_connection_base<Stream>
 {
 public:
     using er_connection_base<Stream>::er_connection_base;
     network_result<no_result> physical_connect(er_endpoint kind) override
     {
-        return impl([&](error_code& code, error_info& info) {
-            info.clear();
-            this->conn_.next_layer().lowest_layer().connect(get_endpoint<Stream>(kind), code);
+        return impl([&] {
+            this->conn_.next_layer().lowest_layer().connect(get_endpoint<Stream>(kind));
             return no_result();
         });
     }
@@ -123,70 +123,63 @@ public:
         const boost::mysql::connection_params& params
     ) override
     {
-        return impl([&](error_code& code, error_info& info) {
-            this->conn_.connect(get_endpoint<Stream>(kind), params, code, info);
+        return impl([&] {
+            this->conn_.connect(get_endpoint<Stream>(kind), params);
             return no_result();
         });
     }
     network_result<no_result> handshake(const connection_params& params) override
     {
-        return impl([&](error_code& code, error_info& info) {
-            this->conn_.handshake(params, code, info);
+        return impl([&] {
+            this->conn_.handshake(params);
             return no_result();
         });
     }
     network_result<er_resultset_ptr> query(boost::string_view query) override
     {
-        return impl([&](error_code& code, error_info& info) {
-            return erase_resultset<sync_errc_resultset>(this->conn_.query(query, code, info));
+        return impl([&] {
+            return erase_resultset<sync_exc_resultset>(this->conn_.query(query));
         });
     }
     network_result<er_statement_ptr> prepare_statement(boost::string_view statement) override
     {
-        return impl([&](error_code& err, error_info& info) {
-            return erase_statement<sync_errc_statement>(this->conn_.prepare_statement(statement, err, info));
+        return impl([&] {
+            return erase_statement<sync_exc_statement>(this->conn_.prepare_statement(statement));
         });
     }
     network_result<no_result> quit() override
     {
-        return impl([&](error_code& code, error_info& info) {
-            this->conn_.quit(code, info);
+        return impl([&] {
+            this->conn_.quit();
             return no_result();
         });
     }
     network_result<no_result> close() override
     {
-        return impl([&](error_code& code, error_info& info) {
-            this->conn_.close(code, info);
+        return impl([&] {
+            this->conn_.close();
             return no_result();
         });
     }
 };
 
 template <class Stream>
-class sync_errc_variant : public er_network_variant_base<Stream, sync_errc_connection>
+class sync_exc_variant : public er_network_variant_base<Stream, sync_exc_connection>
 {
 public:
-    const char* variant_name() const override { return "sync_errc"; }
+    const char* variant_name() const override { return "sync_exc"; }
 };
 
-sync_errc_variant<tcp_socket> tcp;
-sync_errc_variant<tcp_ssl_socket> tcp_ssl;
-sync_errc_variant<tcp_ssl_future_socket> def_compl;
-#if BOOST_ASIO_HAS_LOCAL_SOCKETS
-sync_errc_variant<unix_socket> unix;
-#endif
+sync_exc_variant<tcp_socket> tcp;
+sync_exc_variant<tcp_ssl_socket> tcp_ssl;
+// UNIX sockets don't add much value here
 
 } // anon namespace
 
-void boost::mysql::test::add_sync_errc(
+void boost::mysql::test::add_sync_exc(
     std::vector<er_network_variant*>& output
 )
 {
     output.push_back(&tcp);
     output.push_back(&tcp_ssl);
-    output.push_back(&def_compl);
-#if BOOST_ASIO_HAS_LOCAL_SOCKETS
-    output.push_back(&unix);
-#endif
 }
