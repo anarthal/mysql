@@ -85,6 +85,7 @@ add_executable(
     integration/utils/src/async_callback_noerrinfo.cpp
     integration/utils/src/async_future.cpp
     integration/utils/src/async_coroutine.cpp
+    integration/utils/src/async_coroutinecpp20.cpp
     integration/utils/src/default_completion_tokens.cpp
 
 

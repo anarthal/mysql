@@ -53,19 +53,27 @@ unit-test boost_mysql_unittests
         unit/connection.cpp
         unit/socket_connection.cpp
         unit/entry_point.cpp
+    :
+    :
+    :
+        <include>integration/utils/include
     ;
     
 unit-test boost_mysql_integrationtests 
     :
         boost_mysql_test
         /boost/coroutine//boost_coroutine
-        integration/network_functions/impl/network_functions.cpp
-        integration/network_functions/impl/tcp.cpp
-        integration/network_functions/impl/tcp_ssl.cpp
-        integration/network_functions/impl/unix.cpp
-        integration/network_functions/impl/unix_ssl.cpp
-        integration/network_functions/impl/tcp_ssl_future.cpp
-        integration/metadata_validator.cpp
+        integration/utils/src/metadata_validator.cpp
+        integration/utils/src/network_result.cpp
+        integration/utils/src/er_network_variant.cpp
+        integration/utils/src/sync_errc.cpp
+        integration/utils/src/sync_exc.cpp
+        integration/utils/src/async_callback.cpp
+        integration/utils/src/async_callback_noerrinfo.cpp
+        integration/utils/src/async_future.cpp
+        integration/utils/src/async_coroutine.cpp
+        integration/utils/src/async_coroutinecpp20.cpp
+        integration/utils/src/default_completion_tokens.cpp
         integration/connection.cpp
         integration/connect.cpp
         integration/handshake.cpp
