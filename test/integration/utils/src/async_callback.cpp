@@ -202,11 +202,12 @@ template <class Stream>
 class async_callback_variant : public er_network_variant_base<Stream, async_callback_connection>
 {
 public:
-    const char* variant_name() const override { return "async_callback_errinfo"; }
+    const char* variant_name() const override { return "async_callback"; }
 };
 
 async_callback_variant<tcp_socket> tcp;
 async_callback_variant<tcp_ssl_socket> tcp_ssl;
+async_callback_variant<tcp_ssl_future_socket> def_compl;
 #if BOOST_ASIO_HAS_LOCAL_SOCKETS
 async_callback_variant<unix_socket> unix;
 #endif
@@ -219,6 +220,7 @@ void boost::mysql::test::add_async_callback(
 {
     output.push_back(&tcp);
     output.push_back(&tcp_ssl);
+    output.push_back(&def_compl);
 #if BOOST_ASIO_HAS_LOCAL_SOCKETS
     output.push_back(&unix);
 #endif

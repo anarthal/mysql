@@ -28,12 +28,9 @@ void add_sync_errc(std::vector<er_network_variant*>&);
 void add_sync_exc(std::vector<er_network_variant*>&);
 void add_async_callback(std::vector<er_network_variant*>&);
 void add_async_callback_noerrinfo(std::vector<er_network_variant*>&);
-void add_async_future_errinfo(std::vector<er_network_variant*>&);
-void add_async_future_noerrinfo(std::vector<er_network_variant*>&);
-void add_async_coroutine_errinfo(std::vector<er_network_variant*>&);
-void add_async_coroutine_noerrinfo(std::vector<er_network_variant*>&);
-void add_async_coroutinecpp20_errinfo(std::vector<er_network_variant*>&);
-void add_async_coroutinecpp20_noerrinfo(std::vector<er_network_variant*>&);
+void add_async_future(std::vector<er_network_variant*>&);
+void add_async_coroutine(std::vector<er_network_variant*>&);
+void add_async_coroutinecpp20(std::vector<er_network_variant*>&);
 void add_default_completion_tokens(std::vector<er_network_variant*>&);
 
 
