@@ -54,8 +54,6 @@ unit-test boost_mysql_unittests
         unit/socket_connection.cpp
         unit/entry_point.cpp
     :
-    :
-    :
         <include>integration/utils/include
     ;
     
