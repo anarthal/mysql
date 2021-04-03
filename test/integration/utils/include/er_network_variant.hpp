@@ -17,20 +17,20 @@ namespace boost {
 namespace mysql {
 namespace test {
 
-class network_variant
+class er_network_variant
 {
 public:
-    virtual ~network_variant() {}
+    virtual ~er_network_variant() {}
     virtual bool supports_ssl() const = 0;
     virtual const char* stream_name() const = 0;
     virtual const char* variant_name() const = 0;
     virtual er_connection_ptr create(boost::asio::io_context::executor_type, boost::asio::ssl::context&) = 0;
 };
 
-const std::vector<network_variant*>& all_variants();
-const std::vector<network_variant*>& ssl_variants();
-const std::vector<network_variant*>& non_ssl_variants();
-network_variant* tcp_sync_errc_variant();
+const std::vector<er_network_variant*>& all_variants();
+const std::vector<er_network_variant*>& ssl_variants();
+const std::vector<er_network_variant*>& non_ssl_variants();
+er_network_variant* tcp_sync_errc_variant();
 
 } // test
 } // mysql

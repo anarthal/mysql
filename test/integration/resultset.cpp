@@ -99,7 +99,7 @@ struct resultset_sample : network_sample
 {
     resultset_generator* gen;
 
-    resultset_sample(network_variant* net, resultset_generator* gen):
+    resultset_sample(er_network_variant* net, resultset_generator* gen):
         network_sample(net), gen(gen)
     {
     }

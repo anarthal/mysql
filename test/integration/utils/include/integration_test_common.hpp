@@ -32,7 +32,7 @@ struct network_fixture_base
 
 struct network_fixture : network_fixture_base
 {
-    network_variant* var {};
+    er_network_variant* var {};
     er_connection_ptr conn;
     boost::asio::executor_work_guard<boost::asio::io_context::executor_type> guard;
     std::thread runner;
@@ -53,13 +53,13 @@ struct network_fixture : network_fixture_base
         runner.join();
     }
 
-    void setup(network_variant* variant)
+    void setup(er_network_variant* variant)
     {
         var = variant;
         conn = var->create(ctx.get_executor(), ssl_ctx);
     }
 
-    void setup_and_connect(network_variant* variant, ssl_mode m = ssl_mode::require)
+    void setup_and_connect(er_network_variant* variant, ssl_mode m = ssl_mode::require)
     {
         setup(variant);
         connect(m);
@@ -132,9 +132,9 @@ struct network_fixture : network_fixture_base
 // over all different network_function's.
 struct network_sample
 {
-    network_variant* net;
+    er_network_variant* net;
 
-    network_sample(network_variant* var) :
+    network_sample(er_network_variant* var) :
         net(var)
     {
     }

@@ -186,7 +186,7 @@ public:
 };
 
 template <class Stream>
-class errc_variant : public network_variant
+class errc_variant : public er_network_variant
 {
 public:
     bool supports_ssl() const override { return ::supports_ssl<Stream>(); }
@@ -210,7 +210,7 @@ errc_variant<unix_socket> unix;
 } // anon namespace
 
 void boost::mysql::test::add_sync_errc(
-    std::vector<network_variant*>& output
+    std::vector<er_network_variant*>& output
 )
 {
     output.push_back(&tcp);

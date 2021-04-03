@@ -19,9 +19,9 @@ namespace mysql {
 namespace test {
 
 
-void add_sync_errc(std::vector<network_variant*>&);
+void add_sync_errc(std::vector<er_network_variant*>&);
 
-class tcp_variant : public network_variant
+class tcp_variant : public er_network_variant
 {
 public:
     bool supports_ssl() const override { return false; }

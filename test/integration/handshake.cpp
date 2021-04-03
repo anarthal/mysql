@@ -33,7 +33,7 @@ BOOST_AUTO_TEST_SUITE(test_handshake)
 
 struct handshake_fixture : network_fixture
 {
-    void setup_and_physical_connect(network_variant* net)
+    void setup_and_physical_connect(er_network_variant* net)
     {
         setup(net);
         conn->physical_connect(er_endpoint::localhost).validate_no_error();
