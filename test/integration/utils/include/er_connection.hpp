@@ -8,6 +8,7 @@
 #ifndef BOOST_MYSQL_TEST_INTEGRATION_NETWORK_plhcgl_HPP
 #define BOOST_MYSQL_TEST_INTEGRATION_NETWORK_plhcgl_HPP
 
+#include "boost/mysql/error.hpp"
 #include "network_result.hpp"
 #include "er_endpoint.hpp"
 #include "er_resultset.hpp"
@@ -34,6 +35,7 @@ public:
     virtual network_result<er_statement_ptr> prepare_statement(boost::string_view statement) = 0;
     virtual network_result<no_result> quit() = 0;
     virtual network_result<no_result> close() = 0;
+    virtual void sync_close() noexcept = 0; // used by fixture cleanup functions
 };
 
 using er_connection_ptr = std::unique_ptr<er_connection>;

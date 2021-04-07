@@ -47,7 +47,7 @@ struct network_fixture : network_fixture_base
     {
         if (conn)
         {
-            conn->close();
+            conn->sync_close();
         }
         guard.reset();
         runner.join();

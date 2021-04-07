@@ -8,6 +8,7 @@
 #ifndef BOOST_MYSQL_TEST_INTEGRATION_plch19g_HPP
 #define BOOST_MYSQL_TEST_INTEGRATION_plch19g_HPP
 
+#include "boost/mysql/error.hpp"
 #include "boost/mysql/prepared_statement.hpp"
 #include "er_connection.hpp"
 #include "er_network_variant.hpp"
@@ -113,6 +114,16 @@ public:
     bool valid() const override { return conn_.valid(); }
     bool uses_ssl() const override { return conn_.uses_ssl(); }
     bool is_open() const override { return conn_.next_layer().lowest_layer().is_open(); }
+    void sync_close() noexcept override
+    {
+        try
+        {
+            conn_.close();
+        }
+        catch (...)
+        {
+        }
+    }
 };
 
 template <class Stream, template <typename> class ConnectionImpl>
