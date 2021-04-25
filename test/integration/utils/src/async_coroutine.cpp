@@ -204,7 +204,6 @@ public:
 
 async_coroutine_variant<tcp_socket> tcp;
 async_coroutine_variant<tcp_ssl_socket> tcp_ssl;
-async_coroutine_variant<tcp_ssl_future_socket> def_compl;
 
 } // anon namespace
 
@@ -214,5 +213,4 @@ void boost::mysql::test::add_async_coroutine(
 {
     output.push_back(&tcp);
     output.push_back(&tcp_ssl);
-    output.push_back(&def_compl);
 }
