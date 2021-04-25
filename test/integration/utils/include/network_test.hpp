@@ -12,45 +12,19 @@
 
 /**
  * Defines the required infrastructure for network tests.
- * This functionality is accessed via the BOOST_MYSQL_NETWORK_TEST
- * macro. Network tests combine data driven with templated test
- * functionality. They run the specified test across all samples
- * and stream types. Samples are passed in using a generator object
- * (runtime), while stream types are passed in as a MP11 list.
+ * These are data-driven (parametrized) test cases. We don't
+ * use Boost.Test data-driven functionality for this because
+ * tests must have different labels depending on the parameters,
+ * which is not supported by Boost.Test.
  *
- * We can't employ built-in Boost.Test functionality because:
- *   - Data driven + templated tests are not supported.
- *   - We need tests generated with different samples to have
- *     specific names and labels. This is used to filter out
- *     tests using SSL when running under Valgrind, to reduce run time.
+ * All network tests employ type-erased network objects,
+ * defined under the utils/ folder. Network tests are run under
+ * different network variants. Each variant is a combination of a Stream
+ * and a sync/async flavor. Examples: TCP + async with callbacks,
+ * UNIX SSL + sync with exceptions, TCP SSL + C++20 coroutines.
  *
- * BOOST_MYSQL_NETWORK_TEST_EX is passed 4 arguments:
- *   - The test name. Should be a valid C++ identifier.
- *   - Fixture name. All network tests must have a single fixture.
- *     Only constructor/destructor fixtures are supported. The fixture
- *     should be a template with a single argument: the stream name.
- *     See network_fixture for the base class to use.
- *   - Data generator. The name of a class that specifies how to generate
- *     samples. It should have a static function with the following signature:
- *       template <class Stream>
- *       static SampleCollection generate(); // SampleCollection is a collection of samples.
- *     The generated samples may be different for each stream type.
- *     Samples should be streamable and have a
- *     void set_test_attributes(boost::unit_test::test_case&) const
- *     function, allowing the sample to add labels or other properties to the test.
- *   - Stream list. A mp11 list specifying which streams to test with.
- *
- * The helper macro BOOST_MYSQL_NETWORK_TEST runs tests across all
- * supported stream types.
- *
- * The most common generator is network_gen, to run
- * a single test over all network functions. See
- * network_functions.hpp for more info on network functions.
- *
- * After calling BOOST_MYSQL_NETWORK_TEST(_EX), you should define
- * a function body (like in BOOST_AUTO_TEST_CASE). The function
- * will be templated with a Stream type argument, and will have a
- * 'sample' parameter.
+ * Access this feature using the BOOST_MYSQL_NETWORK_TEST_* macros;
+ * they work similar to BOOST_AUTO_TEST_CASE.
  */
 
 namespace boost {
