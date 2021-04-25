@@ -21,7 +21,7 @@ struct connect_op : boost::asio::coroutine
 
     channel<Stream>& chan_;
     error_info& output_info_;
-    const endpoint_type& ep_; // No need for a copy, as we will call it in the first operator() call
+    endpoint_type ep_;
     connection_params params_;
 
     connect_op(
