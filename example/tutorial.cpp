@@ -28,8 +28,14 @@ void main_impl(int argc, char** argv)
     }
 
     //[tutorial_connection
+    // The execution context, required to run I/O operations
     boost::asio::io_context ctx;
+
+    // The SSL context, required to establish TLS connections.
+    // The default SSL options are good enough for us at this point.
     boost::asio::ssl::context ssl_ctx (boost::asio::ssl::context::tls_client);
+
+    // The object defining the connection to the MySQL server.
     boost::mysql::tcp_ssl_connection conn (ctx.get_executor(), ssl_ctx);
     //]
 
@@ -58,7 +64,9 @@ void main_impl(int argc, char** argv)
     //]
 
     //[tutorial_values
-    std::cout << employees.at(0).values().at(0).get<boost::string_view>();
+    const boost::mysql::row& first_row = employees.at(0);
+    boost::mysql::value first_value = first_row.values().at(0);
+    std::cout << first_value << std::endl;
     //]
 
     //[tutorial_close
