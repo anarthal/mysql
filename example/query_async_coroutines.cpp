@@ -62,8 +62,7 @@ void main_impl(int argc, char** argv)
     );
 
     /**
-     * The entry point. We spawn a stackful coroutine using boost::asio::spawn
-     * (see https://www.boost.org/doc/libs/1_75_0/doc/html/boost_asio/reference/spawn.html).
+     * The entry point. We spawn a stackful coroutine using boost::asio::spawn.
      *
      * The coroutine will actually start running when we call io_context::run().
      * It will suspend every time we call one of the asynchronous functions, saving

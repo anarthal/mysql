@@ -122,19 +122,14 @@ void main_impl(int argc, char** argv)
     boost::mysql::tcp_ssl_connection conn (ctx.get_executor(), ssl_ctx);
 
     /**
-     * The entry point. We spawn a thread of execution to run our
-     * coroutine using boost::asio::co_spawn. We pass in a function returning
+     * The entry point. We pass in a function returning
      * a boost::asio::awaitable<void>, as required.
-     *
-     * We pass in a callback to co_spawn. It will be called when
-     * the coroutine completes, with an exception_ptr if there was any error
-     * during execution. We use a promise to wait for the coroutine completion
-     * and transmit any raised exception.
      */
     boost::asio::co_spawn(ctx.get_executor(), [&conn, ep, params] {
         return start_query(conn, ep, params);
     }, boost::asio::detached);
 
+    // Calling run will actually start the requested operations.
     ctx.run();
 }
 

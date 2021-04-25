@@ -98,7 +98,7 @@ void main_impl(int argc, char** argv)
     // If it's not, the certificate will be rejected and handshake or connect will fail.
     ssl_ctx.set_verify_callback(boost::asio::ssl::host_name_verification("mysql"));
 
-    // Pass in our pre-configured SSL context to the connection. Note that we
+    // Pass in our SSL context to the connection. Note that we
     // can create many connections out of a single context. We need to keep the
     // context alive until we finish using the connection.
     boost::mysql::tcp_ssl_connection conn (ctx, ssl_ctx);

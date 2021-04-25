@@ -56,7 +56,7 @@ void main_impl(int argc, char** argv)
      * Prepared statements are stored in the server on a per-connection basis.
      * Once a connection is closed, all prepared statements for that connection are deallocated.
      *
-     * The result of prepare_statement is a mysql::prepared_statement object, which is
+     * The result of prepare_statement is a boost::mysql::prepared_statement object, which is
      * templatized on the stream type of the connection (tcp_ssl_prepared_statement in our case).
      *
      * We prepare two statements, a SELECT and an UPDATE.
@@ -74,7 +74,7 @@ void main_impl(int argc, char** argv)
     /*
      * Once a statement has been prepared, it can be executed as many times as
      * desired, by calling prepared_statement::execute(). execute takes as input a
-     * (possibly empty) collection of mysql::value's and returns a resultset.
+     * (possibly empty) collection of boost::mysql::value's and returns a resultset.
      * The returned resultset works the same as the one returned by connection::query().
      *
      * The parameters passed to execute() are replaced in order of declaration:
@@ -84,8 +84,8 @@ void main_impl(int argc, char** argv)
      * the prepared statement.
      *
      * Any collection providing member functions begin() and end() returning
-     * forward iterators to mysql::value's is acceptable. We use mysql::make_values(),
-     * which creates a std::array with the passed in values converted to mysql::value's.
+     * forward iterators to mysql::value's is acceptable. We use boost::mysql::make_values(),
+     * which creates a std::array with the passed in values converted to boost::mysql::value's.
      * An iterator version of execute() is also available.
      */
     //[prepared_statements_execute
@@ -100,7 +100,7 @@ void main_impl(int argc, char** argv)
      * Run the update. In this case, we must pass in two parameters.
      * Note that MySQL is flexible in the types passed as parameters.
      * In this case, we are sending the value 35000, which gets converted
-     * into a mysql::value with type std::int32_t, while the 'salary'
+     * into a boost::mysql::value with type std::int32_t, while the 'salary'
      * column is declared as a DOUBLE. The MySQL server will do
      * the right thing for us.
      */

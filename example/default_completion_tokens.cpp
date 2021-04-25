@@ -56,10 +56,11 @@ void print_employee(const boost::mysql::row& employee)
 using base_executor_type = boost::asio::io_context::executor_type;
 using coro_executor_type = boost::asio::use_awaitable_t<
     base_executor_type>::executor_with_default<base_executor_type>;
+using stream_type = boost::asio::ssl::stream<
+    boost::asio::basic_stream_socket<boost::asio::ip::tcp, coro_executor_type>
+>;
 using connection_type = boost::mysql::socket_connection<
-    boost::asio::ssl::stream<
-        boost::asio::basic_stream_socket<boost::asio::ip::tcp, coro_executor_type>
-    >
+    stream_type
 >;
 
 // Our coroutine
@@ -76,11 +77,11 @@ boost::asio::awaitable<void, base_executor_type> start_query(
 
         /**
         * Issue the query to the server. Note that async_query returns a
-        * boost::asio::awaitable<boost::mysql::resultset<socket_type>, base_executor_type>,
-        * where socket_type is a TCP socket bound to coro_executor_type.
-        * Calling co_await on this expression will yield a boost::mysql::resultset<socket_type>.
-        * Note that this is not the same type as a boost::mysql::tcp_resultset because we
-        * used a custom socket type.
+        * boost::asio::awaitable<boost::mysql::resultset<stream_type>, base_executor_type>,
+        * where stream_type is the type alias we defined previously.
+        * Calling co_await on this expression will yield a boost::mysql::resultset<stream_type>.
+        * Note that this is not the same type as a boost::mysql::tcp_ssl_resultset because we
+        * used a custom stream type.
         */
         const char* sql = "SELECT first_name, last_name, salary FROM employee WHERE company_id = 'HGS'";
         auto result = co_await conn.async_query(sql);
@@ -135,19 +136,14 @@ void main_impl(int argc, char** argv)
     connection_type conn (ctx.get_executor(), ssl_ctx);
 
     /**
-     * The entry point. We spawn a thread of execution to run our
-     * coroutine using boost::asio::co_spawn. We pass in a function returning
+     * The entry point. We pass in a function returning
      * a boost::asio::awaitable<void>, as required.
-     *
-     * We pass in a callback to co_spawn. It will be called when
-     * the coroutine completes, with an exception_ptr if there was any error
-     * during execution. We use a promise to wait for the coroutine completion
-     * and transmit any raised exception.
      */
     boost::asio::co_spawn(ctx.get_executor(), [&conn, ep, params] {
         return start_query(conn, ep, params);
     }, boost::asio::detached);
 
+    // Calling run will actually start the requested operations.
     ctx.run();
 }
 

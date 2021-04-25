@@ -20,12 +20,12 @@
     }
 
 /**
- * Prints an employee to std::cout. An employee here is a mysql::row,
+ * Prints an employee to std::cout. An employee here is a boost::mysql::row,
  * which represents a row returned by a SQL query. You can access the values in
- * the row using row::values(), which returns a vector of mysql::value.
+ * the row using row::values(), which returns a vector of boost::mysql::value.
  *
- * mysql::value represents a single value returned by MySQL, and is defined to be
- * a std::variant of all the types MySQL supports.
+ * boost::mysql::value is a variant-like type representing 
+ * a single value returned by MySQL.
  *
  * row::values() has the same number of elements as fields are in the SQL query,
  * and in the same order.
@@ -62,9 +62,10 @@ void main_impl(int argc, char** argv)
         "boost_mysql_examples" // database to use; leave empty or omit the parameter for no database
     );
 
-    // We will use SSL in all our examples. To enable SSL, use boost::mysql::tcp_ssl_connection.
-    // MySQL 8+ default is to use an authentication method that requires SSL, so we encourage
-    // you to use SSL connections if you can.
+    /* We will use SSL in all our examples. To enable SSL, use boost::mysql::tcp_ssl_connection.
+     * MySQL 8+ default is to use an authentication method that requires SSL, so we encourage
+     * you to use SSL connections if you can.
+     */
     boost::asio::io_context ctx;
     boost::asio::ssl::context ssl_ctx (boost::asio::ssl::context::tls_client);
 
@@ -79,7 +80,7 @@ void main_impl(int argc, char** argv)
     conn.connect(ep, params);
 
     /**
-     * To issue a SQL query to the database server, use tcp_connection::query, which takes
+     * To issue a SQL query to the database server, use tcp_ssl_connection::query, which takes
      * the SQL to be executed as parameter and returns a resultset object.
      *
      * Resultset objects represent the result of a query, in tabular format.

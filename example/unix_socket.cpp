@@ -28,10 +28,11 @@ void print_employee(const boost::mysql::row& employee)
         exit(1); \
     }
 
-// UNIX sockets are only available in, er, UNIX systems. Typedefs for
-// UNIX socket-based connections are only available in UNIX systems.
-// Check for BOOST_ASIO_HAS_LOCAL_SOCKETS to know if UNIX socket
-// typedefs are available in your system.
+/* UNIX sockets are only available in, er, UNIX systems. Typedefs for
+ * UNIX socket-based connections are only available in UNIX systems.
+ * Check for BOOST_ASIO_HAS_LOCAL_SOCKETS to know if UNIX socket
+ * typedefs are available in your system.
+ */
 #ifdef BOOST_ASIO_HAS_LOCAL_SOCKETS
 
 void main_impl(int argc, char** argv)
