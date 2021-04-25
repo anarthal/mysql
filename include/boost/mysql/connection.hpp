@@ -34,7 +34,8 @@ namespace mysql {
  *
  * \details
  * Represents a connection to a MySQL server, allowing you to interact with it.
- * If using a socket (e.g. TCP or UNIX), consider using [reflink socket_connection].
+ * If your stream is a socket (e.g. TCP or UNIX), or a SSL stream on an underlying socket,
+ * consider using [reflink socket_connection] instead of this class.
  *
  * Because of how the MySQL protocol works, you must fully perform an operation before
  * starting the next one. More information [link mysql.async.sequencing here].
@@ -130,7 +131,9 @@ public:
 
     /**
      * \brief Returns whether the connection uses SSL or not.
-     * \details This function always returns `false` for connections that haven't been
+     * \details This function always returns `false` if the underlying
+     * stream does not support SSL. This function always returns `false` 
+     * for connections that haven't been
      * established yet (handshake not run yet). If the handshake fails,
      * the return value is undefined.
      *
@@ -145,8 +148,11 @@ public:
      * \details Does not connect the underlying stream. 
      * Prefer [refmem socket_connection connect] if possible.
      *
-     * If SSL certificate validation was configured (by providing a custom SSL context
-     * to this class' constructor) and fails, this function will fail.
+     * RP TODO: me he quedado aquí
+     * If using a SSL-capable stream, the SSL handshake will be performed by this function.
+     * If SSL certificate validation was configured (by setting the relevant option in the
+     * [asioreflink ])
+     * If SSL certificate validation was configured (by setting the relevant) and fails, this function will fail.
      */
     void handshake(const connection_params& params, error_code& ec, error_info& info);
 

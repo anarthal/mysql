@@ -14,25 +14,16 @@
 namespace boost {
 namespace mysql {
 
-/// Determines whether to use TLS for the connection or not.
+/// Determines whether to use TLS for the connection or not; ignored for non-SSL connections.
 enum class ssl_mode
 {
-    /** Never use TLS
-
-        Test.
-     */
+    /// Never use TLS
     disable,
 
-    /** Use TLS if the server supports it, fall back to non-encrypted connection if it does not.
-
-        Test.
-     */
+    /// Use TLS if the server supports it, fall back to non-encrypted connection if it does not.
     enable,
 
-    /** Always use TLS; abort the connection if the server does not support it.
-
-        Test.
-     */
+    /// Always use TLS; abort the connection if the server does not support it.
     require
 };
 
@@ -57,7 +48,7 @@ public:
      * \param db Database name to use, or empty string for no database (this is the default).
      * \param connection_col [reflink2 collation Collation] to use for the connection.
      * Impacts how text queries and prepared statements are interpreted. Defaults to utf8_general_ci.
-     * \param mode The [reflink ssl_mode] to use with this connection.
+     * \param mode The [reflink ssl_mode] to use with this connection; ignored if the connection does not support SSL.
      */
     connection_params(
         boost::string_view username,
