@@ -76,6 +76,7 @@ endif()
 add_executable(
     boost_mysql_integrationtests
 
+    # Utilities
     integration/utils/src/metadata_validator.cpp
     integration/utils/src/network_result.cpp
     integration/utils/src/er_network_variant.cpp
@@ -88,7 +89,7 @@ add_executable(
     integration/utils/src/async_coroutinecpp20.cpp
     integration/utils/src/default_completion_tokens.cpp
 
-
+    # Actual tests
     integration/connection.cpp
     integration/connect.cpp
     integration/handshake.cpp
@@ -133,7 +134,12 @@ endif()
 # under valgrind. Coroutine tests don't work well under Valgrind, and
 # SSL tests are too slow. We do some other exclusions to reduce runtime
 if (BOOST_MYSQL_VALGRIND_TESTS)
-    set(TEST_FILTER "!@sha256:!@ssl:!@async_coroutine_errinfo:!@async_coroutine_noerrinfo:!@unix:!@unix")
+    set(MEMCHECK_BASE_TEST_FILTER "!@ssl:!@async_coroutine")
+    if ("$ENV{BOOST_MYSQL_TEST_FILTER}" STREQUAL "")
+        set(TEST_FILTER ${MEMCHECK_BASE_TEST_FILTER})
+    else()
+        set(TEST_FILTER "${MEMCHECK_BASE_TEST_FILTER}:$ENV{BOOST_MYSQL_TEST_FILTER}")
+    endif()
     add_memcheck_test(
         NAME boost_mysql_integrationtests_memcheck
         COMMAND ${CMAKE_CURRENT_BINARY_DIR}/boost_mysql_integrationtests "-t" ${TEST_FILTER}
