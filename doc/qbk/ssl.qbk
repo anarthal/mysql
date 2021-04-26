@@ -74,6 +74,10 @@ There are three possible values for this [reflink ssl_mode]:
 
 If you're aiming for security, then use `require` (the default).
 
+If you are using `enable`, you can employ
+[refmem connection uses_ssl] to query whether the connection
+uses SSL or not. 
+
 This parameter is ignored for non-SSL connections. In this case, TLS will never
 be used.
 
