@@ -19,8 +19,6 @@ function Check-Call($blk)
 }
 
 $Env:Path += ";C:\Program Files\MySQL\MySQL Server 5.7\bin"
-$Env:Path += ";C:\Libraries\boost_1_73_0\lib64-msvc-14.2"
-$Env:Path += ";C:\Libraries\boost_1_73_0\lib32-msvc-14.2"
 $Env:Path = "C:\Python37-x64;" + $Env:Path # Override Python 2 setting
 $Env:BOOST_MYSQL_TEST_FILTER = "!@unix"
 
