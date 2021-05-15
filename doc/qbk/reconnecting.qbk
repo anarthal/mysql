@@ -8,10 +8,17 @@
 [section:reconnecting Reconnecting a MySQL connection]
 
 After you close a connection or an error has occurred, and if its underlying [reflink Stream]
-supports it, you can re-open an existing connection. This is definitely the case for
-[reflink socket_connection], [reflink tcp_connection] and [reflink unix_connection].
+supports it, you can re-open an existing connection. This is the case for
+[reflink tcp_connection] and [reflink unix_connection].
 
-If you are using a [reflink socket_connection] (including [reflink tcp_connection] and [reflink unix_connection]):
+[warning
+  Unfortunately, [asioreflink ssl__stream ssl::stream] does not support reconnection.
+  If you are using [reflink tcp_ssl_connection] or [reflink unix_ssl_connection] and you close
+  the connection or encounter an error, you will have to destroy and re-create the connection object.
+]
+
+If you are using [reflink tcp_connection] or [reflink unix_connection], or any other stream supporting
+reconnection:
 
 * After calling [refmem socket_connection close], you can re-open the connection later by calling
   [refmem socket_connection connect] normally, even if the close operation failed.
@@ -24,7 +31,8 @@ If you are using a [reflink socket_connection] (including [reflink tcp_connectio
 If you are using [reflink connection], then you are responsible for establishing the physical connection
 and closing the underlying stream, if necessary. Some guidelines:
 
-* After calling [refmem connection quit], you should close the underlying stream, if required. You should then re-establish the physical connection on the stream, and call [refmem connection handshake] afterwards.
+* After calling [refmem connection quit], you should close the underlying stream, if required. 
+  You should then re-establish the physical connection on the stream, and call [refmem connection handshake] afterwards.
 * If your [refmem connection handshake] operation failed, you are responsible for closing the underlying stream if required.
   You should then establish the physical connection again, and then call [refmem connection handshake].
 * If you connected your connection successfully but encountered a network problem in any subsequent operation,

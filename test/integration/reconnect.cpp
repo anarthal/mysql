@@ -71,20 +71,5 @@ BOOST_MYSQL_NETWORK_TEST(reconnect_after_physical_connect_error, reconnect_fixtu
     do_query_ok();
 }
 
-// BOOST_MYSQL_NETWORK_TEST_EX(reconnect_after_ssl_handshake_error, reconnect_fixture, network_gen, all_ssl_streams)
-// {
-//     // Error during SSL certificate validation
-//     this->conn.next_layer().set_verify_mode(boost::asio::ssl::verify_peer);
-//     auto result = sample.net->connect(this->conn, get_endpoint<Stream>(er_endpoint::localhost), this->params);
-//     BOOST_TEST(result.err.message() == "certificate verify failed");
-//     BOOST_TEST(!this->conn.uses_ssl());
-
-//     // Disable certificate validation and use the connection normally
-//     this->conn.next_layer().set_verify_mode(boost::asio::ssl::verify_none);
-//     this->do_connect_ok(sample.net);
-//     BOOST_TEST(this->conn.uses_ssl());
-//     this->do_query_ok(sample.net);
-// }
-
 BOOST_AUTO_TEST_SUITE_END() // test_reconnect
 
