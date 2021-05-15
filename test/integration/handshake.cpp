@@ -5,6 +5,8 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
+#include <boost/asio/ssl/host_name_verification.hpp>
+#include <boost/asio/ssl/verify_mode.hpp>
 #include <boost/mysql/connection_params.hpp>
 #include <boost/mysql/tcp_ssl.hpp>
 #include "boost/mysql/errc.hpp"
@@ -13,8 +15,6 @@
 #include "integration_test_common.hpp"
 #include "streams.hpp"
 #include "test_common.hpp"
-#include <boost/asio/ssl/verify_mode.hpp>
-#include <boost/asio/ssl/host_name_verification.hpp>
 #include <boost/test/unit_test_suite.hpp>
 
 // Tests containing with label 'sha256' require SHA256 functionality.

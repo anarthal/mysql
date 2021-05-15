@@ -37,7 +37,7 @@ BOOST_MYSQL_NETWORK_TEST(select_with_parameters_multiple_executions, network_fix
     validate_2fields_meta(*result, "two_rows_table");
 
     auto rows = result->read_all().get();
-    BOOST_TEST_REQUIRE(rows.size() == 1);
+    BOOST_TEST_REQUIRE(rows.size() == 1u);
     BOOST_TEST((rows[0] == makerow(1, "f0")));
     BOOST_TEST(result->complete());
 
@@ -48,7 +48,7 @@ BOOST_MYSQL_NETWORK_TEST(select_with_parameters_multiple_executions, network_fix
     validate_2fields_meta(*result, "two_rows_table");
 
     rows = result->read_all().get();
-    BOOST_TEST_REQUIRE(rows.size() == 2);
+    BOOST_TEST_REQUIRE(rows.size() == 2u);
     BOOST_TEST((rows[0] == makerow(1, "f0")));
     BOOST_TEST((rows[1] == makerow(2, "f1")));
     BOOST_TEST(result->complete());
@@ -133,7 +133,7 @@ BOOST_MYSQL_NETWORK_TEST(multiple_statements, network_fixture)
     // Execute select
     auto select_result = stmt_select->execute_container(make_value_vector("f0")).get();
     auto rows = select_result->read_all().get();
-    BOOST_TEST(rows.size() == 1);
+    BOOST_TEST(rows.size() == 1u);
     BOOST_TEST(rows[0] == makerow(210));
 
     // Execute update again
@@ -146,7 +146,7 @@ BOOST_MYSQL_NETWORK_TEST(multiple_statements, network_fixture)
     // Execute select again
     select_result = stmt_select->execute_container(make_value_vector("f0")).get();
     rows = select_result->read_all().get();
-    BOOST_TEST(rows.size() == 1);
+    BOOST_TEST(rows.size() == 1u);
     BOOST_TEST(rows[0] == makerow(220));
 
     // Close select

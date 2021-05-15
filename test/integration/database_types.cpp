@@ -619,8 +619,8 @@ BOOST_DATA_TEST_CASE_F(tcp_network_fixture, query, data::make(all_samples))
     validate_meta(result.fields(), {sample.mvalid});
 
     // Validate the returned value
-    BOOST_TEST_REQUIRE(rows.size() == 1);
-    BOOST_TEST_REQUIRE(rows[0].values().size() == 1);
+    BOOST_TEST_REQUIRE(rows.size() == 1u);
+    BOOST_TEST_REQUIRE(rows[0].values().size() == 1u);
     BOOST_TEST(rows[0].values()[0] == sample.expected_value);
 }
 
@@ -644,8 +644,8 @@ BOOST_DATA_TEST_CASE_F(tcp_network_fixture, prepared_statement, data::make(all_s
     validate_meta(result.fields(), {sample.mvalid});
 
     // Validate the returned value
-    BOOST_TEST_REQUIRE(rows.size() == 1);
-    BOOST_TEST_REQUIRE(rows[0].values().size() == 1);
+    BOOST_TEST_REQUIRE(rows.size() == 1u);
+    BOOST_TEST_REQUIRE(rows[0].values().size() == 1u);
     BOOST_TEST(rows[0].values()[0] == sample.expected_value);
 }
 
@@ -688,8 +688,8 @@ BOOST_DATA_TEST_CASE_F(tcp_network_fixture,
     auto rows = result.read_all();
 
     // Validate the returned value
-    BOOST_TEST_REQUIRE(rows.size() == 1);
-    BOOST_TEST_REQUIRE(rows[0].values().size() == 1);
+    BOOST_TEST_REQUIRE(rows.size() == 1u);
+    BOOST_TEST_REQUIRE(rows[0].values().size() == 1u);
     BOOST_TEST(rows[0].values()[0] == sample.expected_value);
 }
 

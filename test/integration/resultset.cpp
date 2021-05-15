@@ -161,7 +161,7 @@ BOOST_MYSQL_NETWORK_TEST_EX(no_results, resultset_fixture, sample_gen())
     auto result = generate("SELECT * FROM empty_table");
     BOOST_TEST(result->valid());
     BOOST_TEST(!result->complete());
-    BOOST_TEST(result->fields().size() == 2);
+    BOOST_TEST(result->fields().size() == 2u);
 
     // Already in the end of the resultset, we receive the EOF
     row r = make_initial_row();
@@ -184,7 +184,7 @@ BOOST_MYSQL_NETWORK_TEST_EX(one_row, resultset_fixture, sample_gen())
     auto result = generate("SELECT * FROM one_row_table");
     BOOST_TEST(result->valid());
     BOOST_TEST(!result->complete());
-    BOOST_TEST(result->fields().size() == 2);
+    BOOST_TEST(result->fields().size() == 2u);
 
     // Read the only row
     row r = make_initial_row();
@@ -208,7 +208,7 @@ BOOST_MYSQL_NETWORK_TEST_EX(two_rows, resultset_fixture, sample_gen())
     auto result = generate("SELECT * FROM two_rows_table");
     BOOST_TEST(result->valid());
     BOOST_TEST(!result->complete());
-    BOOST_TEST(result->fields().size() == 2);
+    BOOST_TEST(result->fields().size() == 2u);
 
     // Read first row
     row r = make_initial_row();
