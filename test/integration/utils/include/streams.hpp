@@ -5,8 +5,8 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_MYSQL_TEST_INTEGRATION_STREAM_LIST_HPP
-#define BOOST_MYSQL_TEST_INTEGRATION_STREAM_LIST_HPP
+#ifndef BOOST_MYSQL_TEST_INTEGRATION_UTILS_INCLUDE_STREAMS_HPP
+#define BOOST_MYSQL_TEST_INTEGRATION_UTILS_INCLUDE_STREAMS_HPP
 
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/asio/local/stream_protocol.hpp>

@@ -5,8 +5,8 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_MYSQL_TEST_INTEGRATION_plch19_HPP
-#define BOOST_MYSQL_TEST_INTEGRATION_plch19_HPP
+#ifndef BOOST_MYSQL_TEST_INTEGRATION_UTILS_INCLUDE_ER_NETWORK_VARIANT_HPP
+#define BOOST_MYSQL_TEST_INTEGRATION_UTILS_INCLUDE_ER_NETWORK_VARIANT_HPP
 
 #include "er_connection.hpp"
 #include <boost/asio/ssl/context.hpp>

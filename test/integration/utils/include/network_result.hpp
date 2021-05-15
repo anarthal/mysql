@@ -5,8 +5,8 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_MYSQL_TEST_INTEGRATION_plch1_HPP
-#define BOOST_MYSQL_TEST_INTEGRATION_plch1_HPP
+#ifndef BOOST_MYSQL_TEST_INTEGRATION_UTILS_INCLUDE_NETWORK_RESULT_HPP
+#define BOOST_MYSQL_TEST_INTEGRATION_UTILS_INCLUDE_NETWORK_RESULT_HPP
 
 #include <boost/optional/optional.hpp>
 #include <boost/mysql/error.hpp>

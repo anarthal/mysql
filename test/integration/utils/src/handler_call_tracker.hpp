@@ -5,8 +5,8 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_MYSQL_TEST_INTEGRATION_plch19ggg_HPP
-#define BOOST_MYSQL_TEST_INTEGRATION_plch19ggg_HPP
+#ifndef BOOST_MYSQL_TEST_INTEGRATION_UTILS_SRC_HANDLER_CALL_TRACKER_HPP
+#define BOOST_MYSQL_TEST_INTEGRATION_UTILS_SRC_HANDLER_CALL_TRACKER_HPP
 
 #include <thread>
 #include <boost/test/unit_test.hpp>

@@ -5,8 +5,8 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#ifndef BOOST_MYSQL_TEST_INTEGRATION_plch19g_HPP
-#define BOOST_MYSQL_TEST_INTEGRATION_plch19g_HPP
+#ifndef BOOST_MYSQL_TEST_INTEGRATION_UTILS_SRC_ER_IMPL_COMMON_HPP
+#define BOOST_MYSQL_TEST_INTEGRATION_UTILS_SRC_ER_IMPL_COMMON_HPP
 
 #include "boost/mysql/error.hpp"
 #include "boost/mysql/prepared_statement.hpp"

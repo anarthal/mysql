@@ -1517,6 +1517,13 @@ enum class errc : int
     table_must_have_a_visible_column = 4028, ///< Server error. Error number: 4028, symbol: [mysqllink server-error-reference.html\#error_er_table_must_have_a_visible_column ER_TABLE_MUST_HAVE_A_VISIBLE_COLUMN].
     innodb_compression_failure = 4029, ///< Server error. Error number: 4029, symbol: [mysqllink server-error-reference.html\#error_er_innodb_compression_failure ER_INNODB_COMPRESSION_FAILURE].
     warn_async_conn_failover_network_namespace = 4030, ///< Server error. Error number: 4030, symbol: [mysqllink server-error-reference.html\#error_er_warn_async_conn_failover_network_namespace ER_WARN_ASYNC_CONN_FAILOVER_NETWORK_NAMESPACE].
+    client_interaction_timeout = 4031, ///< Server error. Error number: 4031, symbol: [mysqllink server-error-reference.html\#error_er_client_interaction_timeout ER_CLIENT_INTERACTION_TIMEOUT].
+    invalid_cast_to_geometry = 4032, ///< Server error. Error number: 4032, symbol: [mysqllink server-error-reference.html\#error_er_invalid_cast_to_geometry ER_INVALID_CAST_TO_GEOMETRY].
+    invalid_cast_polygon_ring_direction = 4033, ///< Server error. Error number: 4033, symbol: [mysqllink server-error-reference.html\#error_er_invalid_cast_polygon_ring_direction ER_INVALID_CAST_POLYGON_RING_DIRECTION].
+    gis_different_srids_aggregation = 4034, ///< Server error. Error number: 4034, symbol: [mysqllink server-error-reference.html\#error_er_gis_different_srids_aggregation ER_GIS_DIFFERENT_SRIDS_AGGREGATION].
+    reload_keyring_failure = 4035, ///< Server error. Error number: 4035, symbol: [mysqllink server-error-reference.html\#error_er_reload_keyring_failure ER_RELOAD_KEYRING_FAILURE].
+    sdi_get_keys_invalid_tablespace = 4036, ///< Server error. Error number: 4036, symbol: [mysqllink server-error-reference.html\#error_er_sdi_get_keys_invalid_tablespace ER_SDI_GET_KEYS_INVALID_TABLESPACE].
+    change_rpl_src_wrong_compression_algorithm_size = 4037, ///< Server error. Error number: 4037, symbol: [mysqllink server-error-reference.html\#error_er_change_rpl_src_wrong_compression_algorithm_size ER_CHANGE_RPL_SRC_WRONG_COMPRESSION_ALGORITHM_SIZE].
     incomplete_message = 65536, ///< Client error. An incomplete message was received from the server
     extra_bytes = 65537, ///< Client error. Unexpected extra bytes at the end of a message were received
     sequence_number_mismatch = 65538, ///< Client error. Mismatched sequence numbers
