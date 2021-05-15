@@ -6,8 +6,6 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 #
 
-mysql -u root
-
 # Config
 BOOST_ROOT=/opt/boost-latest
 
@@ -48,6 +46,11 @@ function build_boost {
 
 # Setup database
 function setup_db {
+    # Stop mysql service if it's running (older Ubuntu images boot with mysql)
+    if [ $(pgrep mysql) ]; then
+        sudo /etc/init.d/mysql stop
+    fi
+
     sudo mkdir -p /var/run/mysqld/
     sudo chmod 777 /var/run/mysqld/
     if [ "$TRAVIS_OS_NAME" == "osx" ]; then
