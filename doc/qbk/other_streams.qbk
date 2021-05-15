@@ -68,7 +68,9 @@ roughly equivalent to [refmem socket_connection connect]:
 
 * Connect the underlying stream. You can access it using
   [refmem connection next_layer]. Use whatever connection establishment
-  mechanism the stream implements.
+  mechanism the stream implements. If you are using TLS, you should *not*
+  perform the TLS handshake yourself, as the library will do it as part of the
+  MySQL handshake.
 * Perform the MySQL handshake by calling [refmem connection handshake]
   or [refmem connection async_handshake]. If the handshake operation
   fails, close the stream.
@@ -78,6 +80,7 @@ roughly equivalent to [refmem socket_connection close]:
 
 * Inform the MySQL server that you are quitting the connection
   by calling [refmem connection quit] or [refmem connection async_quit].
+  This will also shutdown TLS, if it's being used. 
 * Close the underlying stream.
 
 

@@ -14,7 +14,7 @@
 namespace boost {
 namespace mysql {
 
-/// Determines whether to use TLS for the connection or not; ignored for non-SSL connections.
+/// Determines whether to use TLS for the connection or not; ignored if the underlying stream is not SSL-capable.
 enum class ssl_mode
 {
     /// Never use TLS

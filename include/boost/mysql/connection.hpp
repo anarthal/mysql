@@ -139,7 +139,7 @@ public:
      *
      * This function can be used to determine
      * whether you are using a SSL connection or not when using
-     * optional SSL (see [reflink ssl_mode]).
+     * SSL negotiation (see [link mysql.ssl.negotiation this section]).
      */
     bool uses_ssl() const noexcept { return get_channel().ssl_active(); }
 
@@ -148,11 +148,8 @@ public:
      * \details Does not connect the underlying stream. 
      * Prefer [refmem socket_connection connect] if possible.
      *
-     * RP TODO: me he quedado aquí
      * If using a SSL-capable stream, the SSL handshake will be performed by this function.
-     * If SSL certificate validation was configured (by setting the relevant option in the
-     * [asioreflink ])
-     * If SSL certificate validation was configured (by setting the relevant) and fails, this function will fail.
+     * See [link mysql.ssl.handshake this section] for more info.
      */
     void handshake(const connection_params& params, error_code& ec, error_info& info);
 
@@ -161,8 +158,8 @@ public:
      * \details Does not connect the underlying stream.
      * Prefer [refmem socket_connection connect] if possible.
      *
-     * If SSL certificate validation was configured (by providing a custom SSL context
-     * to this class' constructor) and fails, this function will fail.
+     * If using a SSL-capable stream, the SSL handshake will be performed by this function.
+     * See [link mysql.ssl.handshake this section] for more info.
      */
     void handshake(const connection_params& params);
 
@@ -174,8 +171,8 @@ public:
      * The strings pointed to by params should be kept alive by the caller
      * until the operation completes, as no copy is made by the library.
      *
-     * If SSL certificate validation was configured (by providing a custom SSL context
-     * to this class' constructor) and fails, this function will fail.
+     * If using a SSL-capable stream, the SSL handshake will be performed by this function.
+     * See [link mysql.ssl.handshake this section] for more info.
      *
      * The handler signature for this operation is `void(boost::mysql::error_code)`.
      */
@@ -201,8 +198,8 @@ public:
      * The strings pointed to by params should be kept alive by the caller
      * until the operation completes, as no copy is made by the library.
      *
-     * If SSL certificate validation was configured (by providing a custom SSL context
-     * to this class' constructor) and fails, this function will fail.
+     * If using a SSL-capable stream, the SSL handshake will be performed by this function.
+     * See [link mysql.ssl.handshake this section] for more info.
      *
      * The handler signature for this operation is `void(boost::mysql::error_code)`.
      */
@@ -350,11 +347,12 @@ public:
      * \brief Notifies the MySQL server that the client wants to end the session
      * (sync with error code version).
      *
-     * \details Sends a quit request to the MySQL server. Both server and client should
-     * close the underlying physical connection after this. This operation involves a network
-     * transfer and thus can fail. This is a low-level operation.
-     * See [link mysql.other_streams.connection this section] for more info.
-     * Prefer [refmem socket_connection close] instead.
+     * \details Sends a quit request to the MySQL server. If the connection is using SSL,
+     * this function will also perform the SSL shutdown. You should 
+     * close the underlying physical connection after calling this function.
+     *
+     * If you're using [reflink socket_connection], prefer [refmem socket_connection close],
+     * as it also takes care of closing the underlying stream.
      */
     void quit(error_code&, error_info&);
 
@@ -362,11 +360,12 @@ public:
      * \brief Notifies the MySQL server that the client wants to end the session
      * (sync with exceptions version).
      *
-     * \details Sends a quit request to the MySQL server. Both server and client should
-     * close the underlying physical connection after this. This operation involves a network
-     * transfer and thus can fail. This is a low-level operation.
-     * See [link mysql.other_streams.connection this section] for more info.
-     * Prefer [refmem socket_connection close] instead.
+     * \details Sends a quit request to the MySQL server. If the connection is using SSL,
+     * this function will also perform the SSL shutdown. You should 
+     * close the underlying physical connection after calling this function.
+     *
+     * If you're using [reflink socket_connection], prefer [refmem socket_connection close],
+     * as it also takes care of closing the underlying stream.
      */
     void quit();
 
@@ -374,11 +373,12 @@ public:
      * \brief Notifies the MySQL server that the client wants to end the session
      * (async without [reflink error_info] version).
      *
-     * \details Sends a quit request to the MySQL server. Both server and client should
-     * close the underlying physical connection after this. This operation involves a network
-     * transfer and thus can fail. This is a low-level operation.
-     * See [link mysql.other_streams.connection this section] for more info.
-     * Prefer [refmem socket_connection async_close] instead.
+     * \details Sends a quit request to the MySQL server. If the connection is using SSL,
+     * this function will also perform the SSL shutdown. You should 
+     * close the underlying physical connection after calling this function.
+     *
+     * If you're using [reflink socket_connection], prefer [refmem socket_connection close],
+     * as it also takes care of closing the underlying stream.
      *
      * The handler signature for this operation is `void(boost::mysql::error_code)`.
      */
@@ -397,11 +397,12 @@ public:
      * \brief Notifies the MySQL server that the client wants to end the session
      * (async with [reflink error_info] version).
      *
-     * \details Sends a quit request to the MySQL server. Both server and client should
-     * close the underlying physical connection after this. This operation involves a network
-     * transfer and thus can fail. This is a low-level operation.
-     * See [link mysql.other_streams.connection this section] for more info.
-     * Prefer [refmem socket_connection async_close] instead.
+     * \details Sends a quit request to the MySQL server. If the connection is using SSL,
+     * this function will also perform the SSL shutdown. You should 
+     * close the underlying physical connection after calling this function.
+     *
+     * If you're using [reflink socket_connection], prefer [refmem socket_connection close],
+     * as it also takes care of closing the underlying stream.
      *
      * The handler signature for this operation is `void(boost::mysql::error_code)`.
      */

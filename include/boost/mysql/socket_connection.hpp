@@ -19,12 +19,13 @@ namespace boost {
 namespace mysql {
 
 /**
- * \brief A connection to a MySQL server over a socket.
+ * \brief A connection to a MySQL server over a socket or a SSL stream over a socket.
  * \details Extends [reflink connection] with additional
  * functions that require the undrlying stream to be a socket.
  *
  * In general, prefer this class over [reflink connection].
- * See also [reflink tcp_connection] and [reflink unix_connection] for
+ * See also [reflink tcp_ssl_connection], [reflink unix_ssl_connection],
+ * [reflink tcp_connection] and [reflink unix_connection] for
  * the most common instantiations of this template class.
  * See [link mysql.other_streams this section] for more info.
  *
@@ -47,24 +48,24 @@ public:
 
     /**
      * \brief Performs a connection to the MySQL server (sync with error code version).
-     * \details Connects the underlying socket and then performs the handshake
-     * with the server. The underlying socket is closed in case of error. Prefer
+     * \details Connects the underlying stream and then performs the handshake
+     * with the server. The underlying stream is closed in case of error. Prefer
      * this function to [refmem connection handshake].
      *
-     * If SSL certificate validation was configured (by providing a custom SSL context
-     * to this class' constructor) and fails, this function will fail.
+     * If using a SSL-capable stream, the SSL handshake will be performed by this function.
+     * See [link mysql.ssl.handshake this section] for more info.
      */
     void connect(const endpoint_type& endpoint, const connection_params& params,
             error_code& ec, error_info& info);
 
     /**
      * \brief Performs a connection to the MySQL server (sync with exceptions version).
-     * \details Connects the underlying socket and then performs the handshake
-     * with the server. The underlying socket is closed in case of error. Prefer
+     * \details Connects the underlying stream and then performs the handshake
+     * with the server. The underlying stream is closed in case of error. Prefer
      * this function to [refmem connection handshake].
      *
-     * If SSL certificate validation was configured (by providing a custom SSL context
-     * to this class' constructor) and fails, this function will fail.
+     * If using a SSL-capable stream, the SSL handshake will be performed by this function.
+     * See [link mysql.ssl.handshake this section] for more info.
      */
     void connect(const endpoint_type& endpoint, const connection_params& params);
 
@@ -72,15 +73,15 @@ public:
      * \brief Performs a connection to the MySQL server
      *        (async without [reflink error_info] version).
      * \details
-     * Connects the underlying socket and then performs the handshake
-     * with the server. The underlying socket is closed in case of error. Prefer
+     * Connects the underlying stream and then performs the handshake
+     * with the server. The underlying stream is closed in case of error. Prefer
      * this function to [refmem connection async_handshake].
      *
      * The strings pointed to by params should be kept alive by the caller
      * until the operation completes, as no copy is made by the library.
      *
-     * If SSL certificate validation was configured (by providing a custom SSL context
-     * to this class' constructor) and fails, this function will fail.
+     * If using a SSL-capable stream, the SSL handshake will be performed by this function.
+     * See [link mysql.ssl.handshake this section] for more info.
      *
      * The handler signature for this operation is `void(boost::mysql::error_code)`.
      */
@@ -103,15 +104,15 @@ public:
      * \brief Performs a connection to the MySQL server
      *        (async with [reflink error_info] version).
      * \details
-     * Connects the underlying socket and then performs the handshake
-     * with the server. The underlying socket is closed in case of error. Prefer
+     * Connects the underlying stream and then performs the handshake
+     * with the server. The underlying stream is closed in case of error. Prefer
      * this function to [refmem connection async_handshake].
      *
      * The strings pointed to by params should be kept alive by the caller
      * until the operation completes, as no copy is made by the library.
      *
-     * If SSL certificate validation was configured (by providing a custom SSL context
-     * to this class' constructor) and fails, this function will fail.
+     * If using a SSL-capable stream, the SSL handshake will be performed by this function.
+     * See [link mysql.ssl.handshake this section] for more info.
      *
      * The handler signature for this operation is `void(boost::mysql::error_code)`.
      */
@@ -130,22 +131,22 @@ public:
 
     /**
      * \brief Closes the connection (sync with error code version).
-     * \details Sends a quit request and closes the underlying socket.
-     * Prefer this function to [refmem connection quit].
+     * \details Sends a quit request, performs the TLS shutdown (if required)
+     * and closes the underlying stream. Prefer this function to [refmem connection quit].
      */
     void close(error_code&, error_info&);
 
     /**
      * \brief Closes the connection (sync with exceptions version).
-     * \details Sends a quit request and closes the underlying socket.
-     * Prefer this function to [refmem connection quit].
+     * \details Sends a quit request, performs the TLS shutdown (if required)
+     * and closes the underlying stream. Prefer this function to [refmem connection quit].
      */
     void close();
 
     /**
      * \brief Closes the connection (async without [reflink error_info] version).
-     * \details Sends a quit request and closes the underlying socket.
-     * Prefer this function to [refmem connection async_quit].
+     * \details Sends a quit request, performs the TLS shutdown (if required)
+     * and closes the underlying stream. Prefer this function to [refmem connection quit].
      *
      * The handler signature for this operation is `void(boost::mysql::error_code)`.
      */
@@ -162,8 +163,8 @@ public:
 
     /**
      * \brief Closes the connection (async with [reflink error_info] version).
-     * \details Sends a quit request and closes the underlying socket.
-     * Prefer this function to [refmem connection async_quit].
+     * \details Sends a quit request, performs the TLS shutdown (if required)
+     * and closes the underlying stream. Prefer this function to [refmem connection quit].
      *
      * The handler signature for this operation is `void(boost::mysql::error_code)`.
      */
