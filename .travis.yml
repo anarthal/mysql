@@ -57,7 +57,7 @@ matrix:
         - B2_TOOLSET=gcc-5
         - B2_VARIANT=debug,release
       addons: { apt: { packages: [ "g++-5"   ], sources: [ *__ubuntu-toolchain-r-test ] } }
-      dist: trusty
+      dist: xenial
 
     # - name: b2_linux_clang7
     #   <<: *__linux_defaults
