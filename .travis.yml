@@ -49,7 +49,7 @@ env:
 
 matrix:
   include:
-    # Linux b2 builds, covering a range of compilers
+    # Linux b2 builds (old gcc compiler coverage)
     - name: b2_linux_gcc5
       <<: *__linux_defaults
       env:
@@ -59,105 +59,130 @@ matrix:
       addons: { apt: { packages: [ "g++-5"   ], sources: [ *__ubuntu-toolchain-r-test ] } }
       dist: xenial
 
-    # - name: b2_linux_clang7
-    #   <<: *__linux_defaults
-    #   env:
-    #     - B2_CXXSTD=11,14,17
-    #     - B2_TOOLSET=clang
-    #     - B2_VARIANT=debug,release
+    - name: b2_linux_gcc6
+      <<: *__linux_defaults
+      env:
+        - B2_CXXSTD=14
+        - B2_TOOLSET=gcc-6
+        - B2_VARIANT=release
+      addons: { apt: { packages: [ "g++-6"   ], sources: [ *__ubuntu-toolchain-r-test ] } }
 
+    - name: b2_linux_gcc7
+      <<: *__linux_defaults
+      env:
+        - B2_CXXSTD=14
+        - B2_TOOLSET=gcc-7
+        - B2_VARIANT=release
+      addons: { apt: { packages: [ "g++-7"   ], sources: [ *__ubuntu-toolchain-r-test ] } }
 
-    
-    # # Linux CMake builds
-    # - name: cmake_linux_clang10_debug
-    #   <<: *__linux_defaults
-    #   compiler: clang
-    #   env:
-    #     - CMAKE_BUILD_TYPE=Debug
-    #     - CMAKE_CXX_STANDARD=20
-    #     - USE_COVERAGE=1
-    #     - CMAKE_CXX_FLAGS="-stdlib=libc++ -DBOOST_ASIO_DISABLE_CONCEPTS"
-    #     - CMAKE_OPTIONS="-DCMAKE_C_COMPILER=clang-10 -DCMAKE_CXX_COMPILER=clang++-10"
-    #     - CMAKE_B2_OPTIONS="stdlib=libc++"
-    #   install:
-    #     - sudo bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)"
-    #     - sudo apt install clang-10 libc++-10-dev libc++abi-10-dev
+    - name: b2_linux_gcc8
+      <<: *__linux_defaults
+      env:
+        - B2_CXXSTD=17
+        - B2_TOOLSET=gcc-8
+        - B2_VARIANT=release
+      addons: { apt: { packages: [ "g++-8"   ], sources: [ *__ubuntu-toolchain-r-test ] } }
+      dist: focal
 
-    # - name: cmake_linux_gcc_debug
-    #   <<: *__linux_defaults
-    #   compiler: gcc
-    #   env:
-    #     - CMAKE_BUILD_TYPE=Debug
-    #     - USE_VALGRIND=1
-    #     - USE_COVERAGE=1
-    #     - NUM_JOBS=1
+    - name: b2_linux_gcc10
+      <<: *__linux_defaults
+      env:
+        - B2_CXXSTD=20
+        - B2_TOOLSET=gcc-10
+        - B2_VARIANT=release
+      addons: { apt: { packages: [ "g++-10"   ], sources: [ *__ubuntu-toolchain-r-test ] } }
+      dist: focal
+
+    # Linux CMake builds
+    - name: cmake_linux_clang10_debug
+      <<: *__linux_defaults
+      compiler: clang
+      env:
+        - CMAKE_BUILD_TYPE=Debug
+        - CMAKE_CXX_STANDARD=20
+        - USE_COVERAGE=1
+        - CMAKE_CXX_FLAGS="-stdlib=libc++ -DBOOST_ASIO_DISABLE_CONCEPTS"
+        - CMAKE_OPTIONS="-DCMAKE_C_COMPILER=clang-10 -DCMAKE_CXX_COMPILER=clang++-10"
+        - CMAKE_B2_OPTIONS="stdlib=libc++"
+      install:
+        - sudo bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)"
+        - sudo apt install clang-10 libc++-10-dev libc++abi-10-dev
+
+    - name: cmake_linux_gcc7_debug
+      <<: *__linux_defaults
+      compiler: gcc
+      env:
+        - CMAKE_BUILD_TYPE=Debug
+        - USE_VALGRIND=1
+        - USE_COVERAGE=1
+        - NUM_JOBS=1
   
-    # - name: cmake_linux_gcc_release
-    #   <<: *__linux_defaults
-    #   compiler: gcc
-    #   env:
-    #     - CMAKE_BUILD_TYPE=Release
+    - name: cmake_linux_gcc7_release
+      <<: *__linux_defaults
+      compiler: gcc
+      env:
+        - CMAKE_BUILD_TYPE=Release
 
-    # - name: cmake_linux_clang_debug
-    #   <<: *__linux_defaults
-    #   compiler: clang
-    #   env:
-    #     - CMAKE_BUILD_TYPE=Debug
-    #     - USE_VALGRIND=1
-    #     - USE_COVERAGE=1
+    - name: cmake_linux_clang38_debug
+      <<: *__linux_defaults
+      compiler: clang
+      env:
+        - CMAKE_BUILD_TYPE=Debug
+        - USE_VALGRIND=1
+        - USE_COVERAGE=1
 
-    # - name: cmake_linux_clang_release
-    #   <<: *__linux_defaults
-    #   compiler: clang
-    #   env:
-    #     - CMAKE_BUILD_TYPE=Release
+    - name: cmake_linux_clang38_release
+      <<: *__linux_defaults
+      compiler: clang
+      env:
+        - CMAKE_BUILD_TYPE=Release
 
-    # - name: cmake_linux_clang_debug_cxx11
-    #   <<: *__linux_defaults
-    #   compiler: clang
-    #   env:
-    #     - CMAKE_BUILD_TYPE=Debug
-    #     - CMAKE_CXX_STANDARD=11
-    #     - USE_VALGRIND=1
-    #     - USE_COVERAGE=1
+    - name: cmake_linux_clang38_debug_cxx11
+      <<: *__linux_defaults
+      compiler: clang
+      env:
+        - CMAKE_BUILD_TYPE=Debug
+        - CMAKE_CXX_STANDARD=11
+        - USE_VALGRIND=1
+        - USE_COVERAGE=1
 
-    # # OSX builds
-    # - name: cmake_osx_clang_debug
-    #   <<: *__osx_defaults
-    #   env:
-    #     - CMAKE_BUILD_TYPE=Debug
-    #     - USE_COVERAGE=1
+    # OSX builds
+    - name: cmake_osx_clang_debug
+      <<: *__osx_defaults
+      env:
+        - CMAKE_BUILD_TYPE=Debug
+        - USE_COVERAGE=1
 
-    # - name: cmake_osx_clang_release
-    #   <<: *__osx_defaults
-    #   env:
-    #     - CMAKE_BUILD_TYPE=Release
+    - name: cmake_osx_clang_release
+      <<: *__osx_defaults
+      env:
+        - CMAKE_BUILD_TYPE=Release
 
-    # - name: b2_osx_clang
-    #   <<: *__osx_defaults
-    #   env:
-    #     - B2_CXXSTD=11,14,17
-    #     - B2_TOOLSET=clang
-    #     - B2_VARIANT=debug,release
+    - name: b2_osx_clang
+      <<: *__osx_defaults
+      env:
+        - B2_CXXSTD=11,14,17
+        - B2_TOOLSET=clang
+        - B2_VARIANT=debug,release
 
-    # # Other database version builds (CMake Linux)
-    # - name: cmake_linux_clang_debug_mysql5
-    #   <<: *__linux_defaults
-    #   compiler: clang
-    #   env:
-    #     - CMAKE_BUILD_TYPE=Debug
-    #     - DATABASE=mysql:5
-    #     - USE_VALGRIND=1
-    #     - USE_COVERAGE=1
+    # Other database version builds (CMake Linux)
+    - name: cmake_linux_clang38_debug_mysql5
+      <<: *__linux_defaults
+      compiler: clang
+      env:
+        - CMAKE_BUILD_TYPE=Debug
+        - DATABASE=mysql:5
+        - USE_VALGRIND=1
+        - USE_COVERAGE=1
         
-    # - name: cmake_linux_clang_debug_mariadb
-    #   <<: *__linux_defaults
-    #   compiler: clang
-    #   env:
-    #     - CMAKE_BUILD_TYPE=Debug
-    #     - DATABASE=mariadb:10.3
-    #     - USE_VALGRIND=1
-    #     - USE_COVERAGE=1
+    - name: cmake_linux_clang38_debug_mariadb
+      <<: *__linux_defaults
+      compiler: clang
+      env:
+        - CMAKE_BUILD_TYPE=Debug
+        - DATABASE=mariadb:10.3
+        - USE_VALGRIND=1
+        - USE_COVERAGE=1
 
         
         
