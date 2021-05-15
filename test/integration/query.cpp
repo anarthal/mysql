@@ -28,13 +28,13 @@ BOOST_MYSQL_NETWORK_TEST(insert_ok, network_fixture)
     BOOST_TEST(result->fields().empty());
     BOOST_TEST(result->valid());
     BOOST_TEST(result->complete());
-    BOOST_TEST(result->affected_rows() == 1);
-    BOOST_TEST(result->warning_count() == 0);
-    BOOST_TEST(result->last_insert_id() > 0);
+    BOOST_TEST(result->affected_rows() == 1u);
+    BOOST_TEST(result->warning_count() == 0u);
+    BOOST_TEST(result->last_insert_id() > 0u);
     BOOST_TEST(result->info() == "");
 
     // Verify insertion took place
-    BOOST_TEST(this->get_table_size("inserts_table") == 1);
+    BOOST_TEST(this->get_table_size("inserts_table") == 1u);
 }
 
 BOOST_MYSQL_NETWORK_TEST(insert_error, network_fixture)
@@ -58,9 +58,9 @@ BOOST_MYSQL_NETWORK_TEST(update_ok, network_fixture)
     BOOST_TEST(result->fields().empty());
     BOOST_TEST(result->valid());
     BOOST_TEST(result->complete());
-    BOOST_TEST(result->affected_rows() == 2);
-    BOOST_TEST(result->warning_count() == 0);
-    BOOST_TEST(result->last_insert_id() == 0);
+    BOOST_TEST(result->affected_rows() == 2u);
+    BOOST_TEST(result->warning_count() == 0u);
+    BOOST_TEST(result->last_insert_id() == 0u);
     validate_string_contains(std::string(result->info()), {"rows matched"});
 
     // Validate it took effect

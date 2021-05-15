@@ -48,9 +48,9 @@ bool operator==(const std::vector<row>& lhs, const std::vector<row>& rhs)
 
 void validate_eof(
     const er_resultset& result,
-    int affected_rows=0,
-    int warnings=0,
-    int last_insert=0,
+    unsigned affected_rows=0,
+    unsigned warnings=0,
+    unsigned last_insert=0,
     boost::string_view info=""
 )
 {

@@ -6,12 +6,12 @@
 //
 
 //[example_ssl
-#include <boost/mysql.hpp>
 #include <boost/asio/io_context.hpp>
 #include <boost/system/system_error.hpp>
 #include <boost/asio/ssl/context.hpp>
 #include <boost/asio/ssl/host_name_verification.hpp>
 #include <iostream>
+#include <boost/mysql.hpp>
 
 #define ASSERT(expr) \
     if (!(expr)) \

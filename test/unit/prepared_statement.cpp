@@ -35,8 +35,8 @@ BOOST_AUTO_TEST_CASE(init_ctor)
     chan_t chan;
     stmt_t s (chan, com_stmt_prepare_ok_packet{10, 9, 8, 7});
     BOOST_TEST(s.valid());
-    BOOST_TEST(s.id() == 10);
-    BOOST_TEST(s.num_params() == 8);
+    BOOST_TEST(s.id() == 10u);
+    BOOST_TEST(s.num_params() == 8u);
 }
 
 // move ctor
@@ -55,8 +55,8 @@ BOOST_AUTO_TEST_CASE(move_ctor_from_valid)
     stmt_t s2 (std::move(s1));
     BOOST_TEST(!s1.valid());
     BOOST_TEST(s2.valid());
-    BOOST_TEST(s2.id() == 10);
-    BOOST_TEST(s2.num_params() == 8);
+    BOOST_TEST(s2.id() == 10u);
+    BOOST_TEST(s2.num_params() == 8u);
 }
 
 // move assign
@@ -87,8 +87,8 @@ BOOST_AUTO_TEST_CASE(move_assign_valid_to_invalid)
     s2 = std::move(s1);
     BOOST_TEST(!s1.valid());
     BOOST_TEST(s2.valid());
-    BOOST_TEST(s2.id() == 10);
-    BOOST_TEST(s2.num_params() == 8);
+    BOOST_TEST(s2.id() == 10u);
+    BOOST_TEST(s2.num_params() == 8u);
 }
 
 BOOST_AUTO_TEST_CASE(move_assign_valid_to_valid)
@@ -99,8 +99,8 @@ BOOST_AUTO_TEST_CASE(move_assign_valid_to_valid)
     s2 = std::move(s1);
     BOOST_TEST(!s1.valid());
     BOOST_TEST(s2.valid());
-    BOOST_TEST(s2.id() == 10);
-    BOOST_TEST(s2.num_params() == 8);
+    BOOST_TEST(s2.id() == 10u);
+    BOOST_TEST(s2.num_params() == 8u);
 }
 
 // rebind executor

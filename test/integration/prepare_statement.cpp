@@ -26,7 +26,7 @@ BOOST_MYSQL_NETWORK_TEST(ok_no_params, network_fixture)
     auto stmt = conn->prepare_statement("SELECT * FROM empty_table").get();
     BOOST_TEST_REQUIRE(stmt->valid());
     BOOST_TEST(stmt->id() > 0u);
-    BOOST_TEST(stmt->num_params() == 0);
+    BOOST_TEST(stmt->num_params() == 0u);
 }
 
 BOOST_MYSQL_NETWORK_TEST(ok_with_params, network_fixture)
@@ -35,7 +35,7 @@ BOOST_MYSQL_NETWORK_TEST(ok_with_params, network_fixture)
     auto stmt = conn->prepare_statement("SELECT * FROM empty_table WHERE id IN (?, ?)").get();
     BOOST_TEST_REQUIRE(stmt->valid());
     BOOST_TEST(stmt->id() > 0u);
-    BOOST_TEST(stmt->num_params() == 2);
+    BOOST_TEST(stmt->num_params() == 2u);
 }
 
 BOOST_MYSQL_NETWORK_TEST(invalid_statement, network_fixture)

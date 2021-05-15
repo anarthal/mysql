@@ -10,7 +10,9 @@
 
 #include <boost/asio/ssl/context.hpp>
 #include <type_traits>
+
 #ifndef BOOST_MYSQL_DOXYGEN // For some arcane reason, Doxygen fails to expand Asio macros without this
+
 #include <boost/mysql/detail/protocol/channel.hpp>
 #include <boost/mysql/detail/protocol/protocol_types.hpp>
 #include <boost/mysql/detail/network_algorithms/handshake.hpp>
@@ -18,6 +20,7 @@
 #include <boost/mysql/resultset.hpp>
 #include <boost/mysql/prepared_statement.hpp>
 #include <boost/mysql/connection_params.hpp>
+
 #endif
 
 /// The Boost libraries namespace.
