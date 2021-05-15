@@ -23,6 +23,12 @@ environment:
     B2_VARIANT: release,debug
     B2_CXXSTD: 11,14,17
   matrix:
+    # Older Visual Studio versions
+    - FLAVOR: Visual Studio 2017
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+      PLATFORM: x64
+      B2_TOOLSET: msvc-14.1
+      B2_CXXSTD: 17
     # Boost.Build
     - FLAVOR: Visual Studio 2019
       APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
