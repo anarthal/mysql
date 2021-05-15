@@ -34,6 +34,10 @@ __osx_defaults: &__osx_defaults
         - ninja
         - mysql
         - lcov
+
+__ubuntu-toolchain-r-test:
+  - &__ubuntu-toolchain-r-test
+    sourceline: "ppa:ubuntu-toolchain-r/test"
     
 language: cpp
 script: bash -e -x tools/build_unix.sh
@@ -45,6 +49,26 @@ env:
 
 matrix:
   include:
+    # Linux b2 builds, covering a range of compilers
+    - name: b2_linux_gcc5
+      <<: *__linux_defaults
+      env:
+        - B2_CXXSTD=11
+        - B2_TOOLSET=gcc-5
+        - B2_VARIANT=debug,release
+      addons: { apt: { packages: [ "g++-5"   ], sources: [ *__ubuntu-toolchain-r-test ] } }
+      dist: trusty
+
+    - name: b2_linux_clang7
+      <<: *__linux_defaults
+      env:
+        - B2_CXXSTD=11,14,17
+        - B2_TOOLSET=clang
+        - B2_VARIANT=debug,release
+
+
+    
+    # Linux CMake builds
     - name: cmake_linux_clang10_debug
       <<: *__linux_defaults
       compiler: clang
@@ -58,32 +82,7 @@ matrix:
       install:
         - sudo bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)"
         - sudo apt install clang-10 libc++-10-dev libc++abi-10-dev
-  
-    # CMake OSX builds
-    - name: cmake_osx_clang_debug
-      <<: *__osx_defaults
-      env:
-        - CMAKE_BUILD_TYPE=Debug
-        - USE_COVERAGE=1
-    - name: cmake_osx_clang_release
-      <<: *__osx_defaults
-      env:
-        - CMAKE_BUILD_TYPE=Release
 
-    # B2 builds
-    - name: b2_linux_clang
-      <<: *__linux_defaults
-      env:
-        - B2_CXXSTD=11,14,17
-        - B2_TOOLSET=clang
-        - B2_VARIANT=debug,release
-    - name: b2_osx_clang
-      <<: *__osx_defaults
-      env:
-        - B2_CXXSTD=11,14,17
-        - B2_TOOLSET=clang
-        - B2_VARIANT=debug,release
-    # Linux CMake builds
     - name: cmake_linux_gcc_debug
       <<: *__linux_defaults
       compiler: gcc
@@ -92,11 +91,13 @@ matrix:
         - USE_VALGRIND=1
         - USE_COVERAGE=1
         - NUM_JOBS=1
+  
     - name: cmake_linux_gcc_release
       <<: *__linux_defaults
       compiler: gcc
       env:
         - CMAKE_BUILD_TYPE=Release
+
     - name: cmake_linux_clang_debug
       <<: *__linux_defaults
       compiler: clang
@@ -104,11 +105,13 @@ matrix:
         - CMAKE_BUILD_TYPE=Debug
         - USE_VALGRIND=1
         - USE_COVERAGE=1
+
     - name: cmake_linux_clang_release
       <<: *__linux_defaults
       compiler: clang
       env:
         - CMAKE_BUILD_TYPE=Release
+
     - name: cmake_linux_clang_debug_cxx11
       <<: *__linux_defaults
       compiler: clang
@@ -117,7 +120,26 @@ matrix:
         - CMAKE_CXX_STANDARD=11
         - USE_VALGRIND=1
         - USE_COVERAGE=1
-    
+
+    # OSX builds
+    - name: cmake_osx_clang_debug
+      <<: *__osx_defaults
+      env:
+        - CMAKE_BUILD_TYPE=Debug
+        - USE_COVERAGE=1
+
+    - name: cmake_osx_clang_release
+      <<: *__osx_defaults
+      env:
+        - CMAKE_BUILD_TYPE=Release
+
+    - name: b2_osx_clang
+      <<: *__osx_defaults
+      env:
+        - B2_CXXSTD=11,14,17
+        - B2_TOOLSET=clang
+        - B2_VARIANT=debug,release
+
     # Other database version builds (CMake Linux)
     - name: cmake_linux_clang_debug_mysql5
       <<: *__linux_defaults
