@@ -146,6 +146,7 @@ function cmake_build {
 }
 
 # Main script
+echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
 setup_db
 
 if [ "$B2_TOOLSET" != "" ]; then # Boost.Build
