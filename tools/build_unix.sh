@@ -6,6 +6,8 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 #
 
+mysql -u root
+
 # Config
 BOOST_ROOT=/opt/boost-latest
 
