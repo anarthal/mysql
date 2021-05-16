@@ -49,6 +49,16 @@ env:
 
 matrix:
   include:
+    # Linux b2 builds (old clang coverage)
+    - name: b2_linux_clang33
+      <<: *__linux_defaults
+      env:
+        - B2_CXXSTD=11
+        - B2_TOOLSET=clang-3.3
+        - B2_VARIANT=debug,release
+      addons: { apt: { packages: [ "clang-3.3"] } }
+      dist: xenial
+
     # Linux b2 builds (old gcc compiler coverage)
     - name: b2_linux_gcc5
       <<: *__linux_defaults
