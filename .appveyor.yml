@@ -13,7 +13,7 @@ matrix:
   fast_finish: true
 
 build_script:
-  - call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvarsall.bat" %PLATFORM%
+  - call "C:\Program Files (x86)\Microsoft Visual Studio\%VS_YEAR%\Community\VC\Auxiliary\Build\vcvarsall.bat" %PLATFORM%
   - powershell ". .\tools\build_windows.ps1"
   
 environment:
@@ -22,6 +22,7 @@ environment:
     B2_CXXFLAGS: -permissive-
     B2_VARIANT: release,debug
     B2_CXXSTD: 11,14,17
+    VS_YEAR: 2019
   matrix:
     # Older Visual Studio versions
     - FLAVOR: Visual Studio 2017
@@ -29,6 +30,7 @@ environment:
       PLATFORM: x64
       B2_TOOLSET: msvc-14.1
       B2_CXXSTD: 17
+      VS_YEAR: 2017
     # Boost.Build
     - FLAVOR: Visual Studio 2019
       APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
