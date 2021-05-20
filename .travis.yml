@@ -50,14 +50,41 @@ env:
 matrix:
   include:
     # Linux b2 builds (old clang coverage)
-    - name: b2_linux_clang33
+    - name: b2_linux_clang35
       <<: *__linux_defaults
       env:
-        - B2_CXXSTD=11
-        - B2_TOOLSET=clang-3.3
+        - B2_CXXSTD=14
+        - B2_TOOLSET=clang-3.5
         - B2_VARIANT=debug,release
-      addons: { apt: { packages: [ "clang-3.3"] } }
+      addons: { apt: { packages: [ "clang-3.5"] } }
       dist: xenial
+
+    - name: b2_linux_clang5
+      <<: *__linux_defaults
+      env:
+        - B2_CXXSTD=17
+        - B2_TOOLSET=clang-5
+        - B2_VARIANT=debug,release
+      addons: { apt: { packages: [ "clang-5"] } }
+      dist: xenial
+
+    - name: b2_linux_clang8_libc++
+      <<: *__linux_defaults
+      env:
+        - B2_CXXSTD=17
+        - B2_TOOLSET=clang-8
+        - B2_VARIANT=debug,release
+      addons: { apt: { packages: [ "clang-8", "libc++-8-dev"] } }
+      dist: focal
+
+    - name: b2_linux_clang11_libc++
+      <<: *__linux_defaults
+      env:
+        - B2_CXXSTD=20
+        - B2_TOOLSET=clang-11
+        - B2_VARIANT=debug,release
+      addons: { apt: { packages: [ "clang-11", "libc++-11-dev"] } }
+      dist: focal
 
     # Linux b2 builds (old gcc compiler coverage)
     - name: b2_linux_gcc5
@@ -133,7 +160,7 @@ matrix:
       env:
         - CMAKE_BUILD_TYPE=Release
 
-    - name: cmake_linux_clang38_debug
+    - name: cmake_linux_clang7_debug
       <<: *__linux_defaults
       compiler: clang
       env:
@@ -141,13 +168,13 @@ matrix:
         - USE_VALGRIND=1
         - USE_COVERAGE=1
 
-    - name: cmake_linux_clang38_release
+    - name: cmake_linux_clang7_release
       <<: *__linux_defaults
       compiler: clang
       env:
         - CMAKE_BUILD_TYPE=Release
 
-    - name: cmake_linux_clang38_debug_cxx11
+    - name: cmake_linux_clang7_debug_cxx11
       <<: *__linux_defaults
       compiler: clang
       env:
@@ -176,7 +203,7 @@ matrix:
         - B2_VARIANT=debug,release
 
     # Other database version builds (CMake Linux)
-    - name: cmake_linux_clang38_debug_mysql5
+    - name: cmake_linux_clang7_debug_mysql5
       <<: *__linux_defaults
       compiler: clang
       env:
@@ -185,7 +212,7 @@ matrix:
         - USE_VALGRIND=1
         - USE_COVERAGE=1
         
-    - name: cmake_linux_clang38_debug_mariadb
+    - name: cmake_linux_clang7_debug_mariadb
       <<: *__linux_defaults
       compiler: clang
       env:
